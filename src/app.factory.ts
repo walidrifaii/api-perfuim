@@ -1,4 +1,3 @@
-// src/app.factory.ts
 import { INestApplication, ValidationPipe } from '@nestjs/common';
 import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
 import { NestFactory } from '@nestjs/core';
@@ -13,14 +12,12 @@ export async function createNestApp(
     ? await NestFactory.create(AppModule, adapter)
     : await NestFactory.create(AppModule);
 
-  // CORS (allow your frontend + Swagger)
   app.enableCors({
     origin: true,
     methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
     credentials: true,
   });
 
-  // Validation
   app.useGlobalPipes(
     new ValidationPipe({
       whitelist: true,
@@ -30,7 +27,6 @@ export async function createNestApp(
     }),
   );
 
-  // Swagger
   const config = new DocumentBuilder()
     .setTitle('perfuim API')
     .setDescription('API documentation for perfuim')
@@ -50,7 +46,6 @@ export async function createNestApp(
   return app;
 }
 
-// Helper for serverless adapter
 export function createExpressAdapter() {
   const expressApp = express();
   return { expressApp, adapter: new ExpressAdapter(expressApp) };
