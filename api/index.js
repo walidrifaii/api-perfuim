@@ -1,7 +1,6 @@
-// Plain JS so Vercel doesn't try to parse TS
 const serverless = require('serverless-http');
 
-// Import the compiled factory (built by `npm run build`)
+// Import compiled factory built by `npm run build` (dist/app.factory.js)
 const { createExpressAdapter, createNestApp } = require('../dist/app.factory');
 
 let cachedHandler;
@@ -11,7 +10,7 @@ module.exports = async (req, res) => {
     if (!cachedHandler) {
       const { expressApp, adapter } = createExpressAdapter();
       const app = await createNestApp(adapter);
-      await app.init(); // IMPORTANT: don't call app.listen() in serverless
+      await app.init(); // don't call listen()
       cachedHandler = serverless(expressApp);
     }
     return cachedHandler(req, res);
