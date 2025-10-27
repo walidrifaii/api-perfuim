@@ -4,11 +4,16 @@ import { createNestApp } from './app.factory';
 async function bootstrap() {
   const app = await createNestApp();
 
-  // ✅ Use dynamic port for Vercel
-  const port = process.env.PORT || 3000;
-
-  await app.listen(port);
-  console.log(`🚀 Server running on http://localhost:${port}`);
-  console.log(`📘 Swagger Docs available at http://localhost:${port}/docs`);
+  if (process.env.VERCEL) {
+    // On Vercel: don't listen, just export the handler
+    console.log('✅ Running on Vercel serverless function');
+  } else {
+    // Local development
+    const port = process.env.PORT || 3000;
+    await app.listen(port);
+    console.log(`🚀 Server running on http://localhost:${port}`);
+    console.log(`📘 Swagger Docs available at http://localhost:${port}/docs`);
+  }
 }
+
 bootstrap();
