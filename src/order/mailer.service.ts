@@ -1,24 +1,14 @@
 import { Injectable, Logger } from '@nestjs/common';
-import * as nodemailer from 'nodemailer';
+import { Resend } from 'resend';
 
 @Injectable()
 export class MailerService {
   private readonly logger = new Logger(MailerService.name);
+  private readonly resend: Resend;
 
-  private transporter = nodemailer.createTransport({
-    host: process.env.SMTP_HOST || 'smtp.gmail.com',
-    port: Number(process.env.SMTP_PORT) || 587,
-    secure: false, // required for port 587
-    auth: {
-      user: process.env.SMTP_USER,
-      pass: process.env.SMTP_PASS, // must be Gmail App Password
-    },
-    requireTLS: true,
-    connectionTimeout: 10000,
-    greetingTimeout: 8000,
-    socketTimeout: 15000,
-    family: 4,
-  });
+  constructor() {
+    this.resend = new Resend(process.env.RESEND_API_KEY);
+  }
 
   async sendOrderEmail(subject: string, html: string) {
     const to = process.env.ORDER_TO_EMAIL;
@@ -28,23 +18,23 @@ export class MailerService {
     }
 
     try {
-      await this.transporter.sendMail({
-        from: `walidrifaii53@gmail.com`,
+      const response = await this.resend.emails.send({
+        from: 'Walid Rifaii <onboarding@resend.dev>', // you can change this after verifying your domain
         to,
         subject,
         html,
       });
+
       this.logger.log('✅ Order email sent successfully');
+      this.logger.debug('Resend response:', response);
     } catch (err: any) {
-      // Log the full error object for detailed information
       this.logger.error('❌ Failed to send order email:', err);
 
-      // Optionally log specific useful properties
-      if (err.response) {
-        this.logger.error('SMTP Response:', err.response);
+      if (err.name) {
+        this.logger.error('Error Name:', err.name);
       }
-      if (err.code) {
-        this.logger.error('Error Code:', err.code);
+      if (err.message) {
+        this.logger.error('Error Message:', err.message);
       }
       if (err.stack) {
         this.logger.error('Stack Trace:', err.stack);
