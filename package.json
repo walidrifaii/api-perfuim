@@ -5,13 +5,13 @@
   "author": "",
   "private": true,
   "license": "UNLICENSED",
- "scripts": {
-  "prebuild": "npm install -g @nestjs/cli",
-  "build": "nest build",
-  "start": "node dist/main.js",
-  "start:dev": "nest start --watch",
-  "start:prod": "node dist/main.js"
-},
+  "scripts": {
+    "prebuild": "npm install -g @nestjs/cli",
+    "build": "nest build",
+    "start": "node dist/main.js",
+    "start:dev": "nest start --watch",
+    "start:prod": "node dist/main.js"
+  },
   "dependencies": {
     "@nestjs/common": "^9.0.0",
     "@nestjs/config": "^2.2.0",

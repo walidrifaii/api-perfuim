@@ -1,22 +1,22 @@
-const serverless = require('serverless-http');
+import { createNestApp } from '../src/app.factory';
+import serverless from 'serverless-http';
+import { ExpressAdapter } from '@nestjs/platform-express';
+import express from 'express';
 
-// Import compiled factory built by `npm run build` (dist/app.factory.js)
-const { createExpressAdapter, createNestApp } = require('../dist/app.factory');
+const { expressApp, adapter } = createNestApp
+  ? createNestApp()
+  : { expressApp: express(), adapter: new ExpressAdapter(express()) };
 
-let cachedHandler;
+async function bootstrap() {
+  const { expressApp, adapter } = createExpressAdapter();
+  const app = await createNestApp(adapter);
+  await app.init(); // important!
+  return expressApp;
+}
 
-module.exports = async (req, res) => {
-  try {
-    if (!cachedHandler) {
-      const { expressApp, adapter } = createExpressAdapter();
-      const app = await createNestApp(adapter);
-      await app.init(); // don't call listen()
-      cachedHandler = serverless(expressApp);
-    }
-    return cachedHandler(req, res);
-  } catch (err) {
-    console.error('Serverless handler error:', err);
-    res.statusCode = 500;
-    res.end('Internal Server Error');
-  }
+const handler = async (req, res) => {
+  const expressApp = await bootstrap();
+  return expressApp(req, res);
 };
+
+export default serverless(handler);
