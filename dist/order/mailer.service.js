@@ -36,7 +36,7 @@ let MailerService = MailerService_1 = class MailerService {
         }
         try {
             await this.transporter.sendMail({
-                from: `"Store Bot" <${process.env.SMTP_USER}>`,
+                from: `walidrifaii53@gmail.com`,
                 to,
                 subject,
                 html,
