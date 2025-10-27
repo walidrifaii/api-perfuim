@@ -35,8 +35,20 @@ export class MailerService {
         html,
       });
       this.logger.log('✅ Order email sent successfully');
-    } catch (err) {
-      this.logger.error('❌ Failed to send order email:', err.message);
+    } catch (err: any) {
+      // Log the full error object for detailed information
+      this.logger.error('❌ Failed to send order email:', err);
+
+      // Optionally log specific useful properties
+      if (err.response) {
+        this.logger.error('SMTP Response:', err.response);
+      }
+      if (err.code) {
+        this.logger.error('Error Code:', err.code);
+      }
+      if (err.stack) {
+        this.logger.error('Stack Trace:', err.stack);
+      }
     }
   }
 }
