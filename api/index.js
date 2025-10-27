@@ -1,8 +1,8 @@
-// api/index.ts
-import { createNestApp } from '../src/app.factory';
-import serverless from 'serverless-http';
-import { ExpressAdapter } from '@nestjs/platform-express';
-import express from 'express';
+// api/index.js
+const { createNestApp } = require('../dist/src/app.factory');
+const serverless = require('serverless-http');
+const { ExpressAdapter } = require('@nestjs/platform-express');
+const express = require('express');
 
 let cachedExpressApp;
 
@@ -22,4 +22,4 @@ const handler = serverless(async (req, res) => {
   return expressApp(req, res);
 });
 
-export default handler;
+module.exports = handler;
