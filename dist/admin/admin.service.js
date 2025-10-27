@@ -16,7 +16,7 @@ exports.AdminsService = void 0;
 const common_1 = require("@nestjs/common");
 const mongoose_1 = require("@nestjs/mongoose");
 const mongoose_2 = require("mongoose");
-const bcrypt = require("bcrypt");
+const bcrypt = require("bcryptjs");
 const admin_schema_1 = require("./schemas/admin.schema");
 let AdminsService = class AdminsService {
     constructor(adminModel) {
