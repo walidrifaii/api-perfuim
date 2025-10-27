@@ -1,8 +1,7 @@
-// api/index.js
-const { createNestApp } = require('../dist/src/app.factory');
 const serverless = require('serverless-http');
-const { ExpressAdapter } = require('@nestjs/platform-express');
 const express = require('express');
+const { ExpressAdapter } = require('@nestjs/platform-express');
+const { createNestApp } = require('../dist/src/app.factory');
 
 let cachedExpressApp;
 
@@ -11,15 +10,15 @@ async function bootstrap() {
     const expressApp = express();
     const adapter = new ExpressAdapter(expressApp);
     const app = await createNestApp(adapter);
-    await app.init();
+    await app.init(); // important
     cachedExpressApp = expressApp;
   }
   return cachedExpressApp;
 }
 
 const handler = serverless(async (req, res) => {
-  const expressApp = await bootstrap();
-  return expressApp(req, res);
+  const app = await bootstrap();
+  return app(req, res);
 });
 
-module.exports = handler;
+module.exports = handler; // ✅ export handler for Vercel
