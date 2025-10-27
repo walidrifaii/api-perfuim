@@ -8,14 +8,16 @@ export class MailerService {
   private transporter = nodemailer.createTransport({
     host: process.env.SMTP_HOST || 'smtp.gmail.com',
     port: Number(process.env.SMTP_PORT) || 587,
-    secure: false, // important for port 587
+    secure: false, // required for port 587
     auth: {
       user: process.env.SMTP_USER,
-      pass: process.env.SMTP_PASS,
+      pass: process.env.SMTP_PASS, // must be Gmail App Password
     },
     requireTLS: true,
     connectionTimeout: 10000,
+    greetingTimeout: 8000,
     socketTimeout: 15000,
+    family: 4,
   });
 
   async sendOrderEmail(subject: string, html: string) {

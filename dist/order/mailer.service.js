@@ -23,7 +23,9 @@ let MailerService = MailerService_1 = class MailerService {
             },
             requireTLS: true,
             connectionTimeout: 10000,
+            greetingTimeout: 8000,
             socketTimeout: 15000,
+            family: 4,
         });
     }
     async sendOrderEmail(subject, html) {
