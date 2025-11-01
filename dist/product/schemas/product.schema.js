@@ -11,6 +11,7 @@ var __metadata = (this && this.__metadata) || function (k, v) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.ProductSchema = exports.Product = void 0;
 const mongoose_1 = require("@nestjs/mongoose");
+const create_product_dto_1 = require("../dto/create-product.dto");
 let Product = class Product {
 };
 __decorate([
@@ -30,9 +31,17 @@ __decorate([
     __metadata("design:type", String)
 ], Product.prototype, "description", void 0);
 __decorate([
-    (0, mongoose_1.Prop)({ default: '', trim: true }),
-    __metadata("design:type", String)
+    (0, mongoose_1.Prop)({ type: [String], default: [] }),
+    __metadata("design:type", Array)
 ], Product.prototype, "size", void 0);
+__decorate([
+    (0, mongoose_1.Prop)({
+        required: true,
+        enum: Object.values(create_product_dto_1.ProductSex),
+        default: create_product_dto_1.ProductSex.UNISEX,
+    }),
+    __metadata("design:type", String)
+], Product.prototype, "sex", void 0);
 __decorate([
     (0, mongoose_1.Prop)({ default: true }),
     __metadata("design:type", Boolean)

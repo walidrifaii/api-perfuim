@@ -24,6 +24,20 @@ let ProductService = class ProductService {
     async findAll() {
         return this.productModel.find();
     }
+    async findWithFilters(filters) {
+        const query = { isActive: true };
+        if (filters.sex)
+            query.sex = filters.sex;
+        if (filters.brand)
+            query.brand = filters.brand;
+        if (filters.minPrice !== undefined)
+            query.price = Object.assign(Object.assign({}, query.price), { $gte: filters.minPrice });
+        if (filters.maxPrice !== undefined)
+            query.price = Object.assign(Object.assign({}, query.price), { $lte: filters.maxPrice });
+        if (filters.size)
+            query.size = filters.size;
+        return this.productModel.find(query).exec();
+    }
     async findById(id) {
         if (!(0, mongoose_2.isValidObjectId)(id))
             throw new common_1.NotFoundException('Product not found.');
@@ -48,6 +62,9 @@ let ProductService = class ProductService {
             throw new common_1.NotFoundException('Product not found.');
         }
         return updated;
+    }
+    async findBySex(sex) {
+        return this.productModel.find({ sex, isActive: true }).exec();
     }
 };
 ProductService = __decorate([

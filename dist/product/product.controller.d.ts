@@ -10,4 +10,6 @@ export declare class ProductController {
     constructor(productService: ProductService, cloudinary: CloudinaryService);
     create(body: CreateProductDto, file?: Express.Multer.File): Promise<Product>;
     update(id: string, body: UpdateProductDto, file?: Express.Multer.File): Promise<Product>;
+    getMenProducts(): Promise<Product[]>;
+    getWomenProducts(): Promise<Product[]>;
 }

@@ -7,6 +7,7 @@ import {
   UploadedFile,
   UseInterceptors,
   UseGuards,
+  Get,
 } from '@nestjs/common';
 import type { Express } from 'express';
 import {
@@ -31,8 +32,8 @@ import { CloudinaryService } from '../cloudinary/cloudinary.service';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 import { AdminGuard } from '../auth/admin.guard';
 
-@ApiTags(' admin products')
-@ApiBearerAuth('bearer') // shows Bearer auth in Swagger
+@ApiTags('Admin Products')
+@ApiBearerAuth('bearer')
 @Controller('products')
 export class ProductController {
   constructor(
@@ -47,20 +48,29 @@ export class ProductController {
   @ApiBody({
     schema: {
       type: 'object',
-      required: ['name', 'brand', 'price'],
+      required: ['name', 'brand', 'price', 'sex'],
       properties: {
         name: { type: 'string', example: 'Body Lotion' },
         brand: { type: 'string', example: 'Nivea' },
         price: { type: 'number', example: 29.99 },
         quantity: { type: 'number', example: 500 },
         description: { type: 'string', example: 'Rich moisturizing lotion' },
-        size: { type: 'string', example: '100 ml' },
+        size: {
+          type: 'array',
+          items: { type: 'string' },
+          example: ['100 ml', '200 ml'],
+        },
+        sex: {
+          type: 'string',
+          enum: ['men', 'women', 'unisex'],
+          example: 'women',
+        },
         isActive: { type: 'boolean', example: true },
         image: { type: 'string', format: 'binary' },
       },
     },
   })
-  @UseGuards(JwtAuthGuard, AdminGuard) // ✅ admin-only
+  @UseGuards(JwtAuthGuard, AdminGuard)
   @UseInterceptors(FileInterceptor('image', { storage: memoryStorage() }))
   @Post()
   async create(
@@ -72,7 +82,7 @@ export class ProductController {
         file.buffer,
         file.originalname,
       );
-      body.image = res.secure_url; // public HTTPS URL
+      body.image = res.secure_url;
     }
     return this.productService.create(body);
   }
@@ -92,13 +102,18 @@ export class ProductController {
         brand: { type: 'string' },
         price: { type: 'number' },
         description: { type: 'string' },
-        size: { type: 'string', example: '200 ml' },
+        size: {
+          type: 'array',
+          items: { type: 'string' },
+          example: ['250 ml', '500 ml'],
+        },
+        sex: { type: 'string', enum: ['men', 'women', 'unisex'] },
         isActive: { type: 'boolean' },
         image: { type: 'string', format: 'binary' },
       },
     },
   })
-  @UseGuards(JwtAuthGuard, AdminGuard) // ✅ admin-only
+  @UseGuards(JwtAuthGuard, AdminGuard)
   @UseInterceptors(FileInterceptor('image', { storage: memoryStorage() }))
   @Put(':id')
   async update(
@@ -114,5 +129,20 @@ export class ProductController {
       (body as any).image = res.secure_url;
     }
     return this.productService.updateById(id, body);
+  }
+
+  // --------- GET PRODUCTS BY SEX ----------
+  @ApiOperation({ summary: 'Get all products for men' })
+  @ApiOkResponse({ description: 'List of products for men' })
+  @Get('men')
+  async getMenProducts(): Promise<Product[]> {
+    return this.productService.findBySex('men');
+  }
+
+  @ApiOperation({ summary: 'Get all products for women' })
+  @ApiOkResponse({ description: 'List of products for women' })
+  @Get('women')
+  async getWomenProducts(): Promise<Product[]> {
+    return this.productService.findBySex('women');
   }
 }

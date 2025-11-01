@@ -5,6 +5,14 @@ import { Product, ProductDocument } from './schemas/product.schema';
 import { CreateProductDto } from './dto/create-product.dto';
 import { UpdateProductDto } from './dto/update-product.dto';
 
+interface ProductFilters {
+  sex?: string;
+  brand?: string;
+  minPrice?: number;
+  maxPrice?: number;
+  size?: string;
+}
+
 @Injectable()
 export class ProductService {
   constructor(
@@ -15,6 +23,20 @@ export class ProductService {
   // ✅ Public list
   async findAll(): Promise<Product[]> {
     return this.productModel.find();
+  }
+
+  async findWithFilters(filters: ProductFilters): Promise<Product[]> {
+    const query: any = { isActive: true }; // only active products
+
+    if (filters.sex) query.sex = filters.sex;
+    if (filters.brand) query.brand = filters.brand;
+    if (filters.minPrice !== undefined)
+      query.price = { ...query.price, $gte: filters.minPrice };
+    if (filters.maxPrice !== undefined)
+      query.price = { ...query.price, $lte: filters.maxPrice };
+    if (filters.size) query.size = filters.size; // exact match; you can use $in if needed
+
+    return this.productModel.find(query).exec();
   }
 
   // ✅ Public single product
@@ -45,5 +67,9 @@ export class ProductService {
       throw new NotFoundException('Product not found.');
     }
     return updated;
+  }
+
+  async findBySex(sex: string): Promise<Product[]> {
+    return this.productModel.find({ sex, isActive: true }).exec();
   }
 }

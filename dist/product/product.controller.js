@@ -42,6 +42,12 @@ let ProductController = class ProductController {
         }
         return this.productService.updateById(id, body);
     }
+    async getMenProducts() {
+        return this.productService.findBySex('men');
+    }
+    async getWomenProducts() {
+        return this.productService.findBySex('women');
+    }
 };
 __decorate([
     (0, swagger_1.ApiOperation)({ summary: 'Create a product (image upload to Cloudinary)' }),
@@ -50,14 +56,23 @@ __decorate([
     (0, swagger_1.ApiBody)({
         schema: {
             type: 'object',
-            required: ['name', 'brand', 'price'],
+            required: ['name', 'brand', 'price', 'sex'],
             properties: {
                 name: { type: 'string', example: 'Body Lotion' },
                 brand: { type: 'string', example: 'Nivea' },
                 price: { type: 'number', example: 29.99 },
                 quantity: { type: 'number', example: 500 },
                 description: { type: 'string', example: 'Rich moisturizing lotion' },
-                size: { type: 'string', example: '100 ml' },
+                size: {
+                    type: 'array',
+                    items: { type: 'string' },
+                    example: ['100 ml', '200 ml'],
+                },
+                sex: {
+                    type: 'string',
+                    enum: ['men', 'women', 'unisex'],
+                    example: 'women',
+                },
                 isActive: { type: 'boolean', example: true },
                 image: { type: 'string', format: 'binary' },
             },
@@ -87,7 +102,12 @@ __decorate([
                 brand: { type: 'string' },
                 price: { type: 'number' },
                 description: { type: 'string' },
-                size: { type: 'string', example: '200 ml' },
+                size: {
+                    type: 'array',
+                    items: { type: 'string' },
+                    example: ['250 ml', '500 ml'],
+                },
+                sex: { type: 'string', enum: ['men', 'women', 'unisex'] },
                 isActive: { type: 'boolean' },
                 image: { type: 'string', format: 'binary' },
             },
@@ -103,8 +123,24 @@ __decorate([
     __metadata("design:paramtypes", [String, update_product_dto_1.UpdateProductDto, Object]),
     __metadata("design:returntype", Promise)
 ], ProductController.prototype, "update", null);
+__decorate([
+    (0, swagger_1.ApiOperation)({ summary: 'Get all products for men' }),
+    (0, swagger_1.ApiOkResponse)({ description: 'List of products for men' }),
+    (0, common_1.Get)('men'),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", []),
+    __metadata("design:returntype", Promise)
+], ProductController.prototype, "getMenProducts", null);
+__decorate([
+    (0, swagger_1.ApiOperation)({ summary: 'Get all products for women' }),
+    (0, swagger_1.ApiOkResponse)({ description: 'List of products for women' }),
+    (0, common_1.Get)('women'),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", []),
+    __metadata("design:returntype", Promise)
+], ProductController.prototype, "getWomenProducts", null);
 ProductController = __decorate([
-    (0, swagger_1.ApiTags)(' admin products'),
+    (0, swagger_1.ApiTags)('Admin Products'),
     (0, swagger_1.ApiBearerAuth)('bearer'),
     (0, common_1.Controller)('products'),
     __metadata("design:paramtypes", [product_service_1.ProductService,

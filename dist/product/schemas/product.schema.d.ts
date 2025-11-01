@@ -23,15 +23,17 @@
 /// <reference types="mongoose/types/virtuals" />
 /// <reference types="mongoose/types/inferschematype" />
 import { Document } from 'mongoose';
+import { ProductSex } from '../dto/create-product.dto';
+export type ProductDocument = Product & Document;
 export declare class Product {
     name: string;
     brand: string;
     price: number;
     description: string;
-    size: string;
+    size: string[];
+    sex: ProductSex;
     isActive: boolean;
     image: string;
     quantity: number;
 }
-export type ProductDocument = Product & Document;
 export declare const ProductSchema: import("mongoose").Schema<Product, import("mongoose").Model<Product, any, any, any, any>, {}, {}, {}, {}, import("mongoose").DefaultSchemaOptions, Product>;

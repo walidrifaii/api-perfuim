@@ -20,8 +20,21 @@ let PublicProductController = class PublicProductController {
     constructor(productService) {
         this.productService = productService;
     }
-    async getAll() {
-        return this.productService.findAll();
+    async getAllWithQuery(sex, brand, minPrice, maxPrice, size) {
+        const filters = {
+            sex,
+            brand,
+            minPrice: minPrice !== undefined ? parseFloat(minPrice) : undefined,
+            maxPrice: maxPrice !== undefined ? parseFloat(maxPrice) : undefined,
+            size,
+        };
+        return this.productService.findWithFilters(filters);
+    }
+    async getMenProducts() {
+        return this.productService.findBySex('men');
+    }
+    async getWomenProducts() {
+        return this.productService.findBySex('women');
     }
     async getOne(id) {
         return this.productService.findById(id);
@@ -31,10 +44,37 @@ __decorate([
     (0, swagger_1.ApiOperation)({ summary: 'Get all products (public)' }),
     (0, swagger_1.ApiOkResponse)({ description: 'List of products returned' }),
     (0, common_1.Get)(),
+    (0, swagger_1.ApiOperation)({ summary: 'Get all products with optional filters' }),
+    (0, swagger_1.ApiQuery)({ name: 'sex', required: false, enum: ['men', 'women', 'unisex'] }),
+    (0, swagger_1.ApiQuery)({ name: 'brand', required: false }),
+    (0, swagger_1.ApiQuery)({ name: 'minPrice', required: false, type: Number }),
+    (0, swagger_1.ApiQuery)({ name: 'maxPrice', required: false, type: Number }),
+    (0, swagger_1.ApiQuery)({ name: 'size', required: false }),
+    __param(0, (0, common_1.Query)('sex')),
+    __param(1, (0, common_1.Query)('brand')),
+    __param(2, (0, common_1.Query)('minPrice')),
+    __param(3, (0, common_1.Query)('maxPrice')),
+    __param(4, (0, common_1.Query)('size')),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [String, String, String, String, String]),
+    __metadata("design:returntype", Promise)
+], PublicProductController.prototype, "getAllWithQuery", null);
+__decorate([
+    (0, swagger_1.ApiOperation)({ summary: 'Get all men products (public)' }),
+    (0, swagger_1.ApiOkResponse)({ description: 'List of men products returned' }),
+    (0, common_1.Get)('/men'),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", []),
     __metadata("design:returntype", Promise)
-], PublicProductController.prototype, "getAll", null);
+], PublicProductController.prototype, "getMenProducts", null);
+__decorate([
+    (0, swagger_1.ApiOperation)({ summary: 'Get all women products (public)' }),
+    (0, swagger_1.ApiOkResponse)({ description: 'List of women products returned' }),
+    (0, common_1.Get)('/women'),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", []),
+    __metadata("design:returntype", Promise)
+], PublicProductController.prototype, "getWomenProducts", null);
 __decorate([
     (0, swagger_1.ApiOperation)({ summary: 'Get a product by id (public)' }),
     (0, swagger_1.ApiOkResponse)({ description: 'Product returned' }),
@@ -46,7 +86,7 @@ __decorate([
     __metadata("design:returntype", Promise)
 ], PublicProductController.prototype, "getOne", null);
 PublicProductController = __decorate([
-    (0, swagger_1.ApiTags)('user  products'),
+    (0, swagger_1.ApiTags)('user products'),
     (0, common_1.Controller)('user/products'),
     __metadata("design:paramtypes", [product_service_1.ProductService])
 ], PublicProductController);

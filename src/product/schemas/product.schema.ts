@@ -1,5 +1,8 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { Document } from 'mongoose';
+import { ProductSex } from '../dto/create-product.dto'; // ✅ reuse the same enum
+
+export type ProductDocument = Product & Document;
 
 @Schema({ timestamps: true })
 export class Product {
@@ -15,14 +18,20 @@ export class Product {
   @Prop({ default: '' })
   description: string;
 
-  // free text like "100 ml", "1L", "500g", "Pair", etc.
-  @Prop({ default: '', trim: true })
-  size: string;
+  @Prop({ type: [String], default: [] })
+  size: string[];
+
+  // ✅ Updated enum values here too
+  @Prop({
+    required: true,
+    enum: Object.values(ProductSex),
+    default: ProductSex.UNISEX,
+  })
+  sex: ProductSex;
 
   @Prop({ default: true })
   isActive: boolean;
 
-  // will store the uploaded file path or URL
   @Prop({ default: '' })
   image: string;
 
@@ -30,5 +39,4 @@ export class Product {
   quantity: number;
 }
 
-export type ProductDocument = Product & Document;
 export const ProductSchema = SchemaFactory.createForClass(Product);
