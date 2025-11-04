@@ -25,8 +25,8 @@ class OrderItem {
   @Prop({ default: '' })
   brand?: string;
 
-  @Prop({ default: '' })
-  size?: string;
+  @Prop({ type: [String], default: [] })
+  size: string[];
 }
 const OrderItemSchema = SchemaFactory.createForClass(OrderItem);
 

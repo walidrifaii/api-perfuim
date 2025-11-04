@@ -39,8 +39,8 @@ __decorate([
     __metadata("design:type", String)
 ], OrderItem.prototype, "brand", void 0);
 __decorate([
-    (0, mongoose_1.Prop)({ default: '' }),
-    __metadata("design:type", String)
+    (0, mongoose_1.Prop)({ type: [String], default: [] }),
+    __metadata("design:type", Array)
 ], OrderItem.prototype, "size", void 0);
 OrderItem = __decorate([
     (0, mongoose_1.Schema)({ _id: false })

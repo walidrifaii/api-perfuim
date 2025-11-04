@@ -31,7 +31,7 @@ declare class OrderItem {
     lineTotal: number;
     name?: string;
     brand?: string;
-    size?: string;
+    size: string[];
 }
 export declare class Order {
     _id: Types.ObjectId;
