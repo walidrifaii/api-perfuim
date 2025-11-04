@@ -40,16 +40,29 @@ export class OrderService {
     );
 
     // ---- 2) Validate and compute pricing
+    // ---- 2) Validate and compute pricing
     let subtotal = 0;
     const items = dto.items.map((it) => {
       const pidStr = String(it.productId);
       const p = byId.get(pidStr);
+
       if (!p) {
         throw new BadRequestException('Product not available');
       }
+
       if ((p.quantity ?? 0) < it.quantity) {
         throw new BadRequestException(`Insufficient stock for ${p.name}`);
       }
+
+      // ✅ Validate the selected size (if product has size options)
+      if (Array.isArray(p.size) && p.size.length > 0) {
+        if (it.size && !p.size.includes(it.size)) {
+          throw new BadRequestException(
+            `Invalid size "${it.size}" for product ${p.name}`,
+          );
+        }
+      }
+
       const unitPrice = p.price;
       const lineTotal = unitPrice * it.quantity;
       subtotal += lineTotal;
@@ -61,7 +74,7 @@ export class OrderService {
         lineTotal,
         name: p.name,
         brand: p.brand,
-        size: p.size,
+        size: it.size || '', // ✅ store user-selected size
       };
     });
 

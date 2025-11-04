@@ -23,6 +23,10 @@ class OrderItemDto {
   @IsNumber()
   @Min(1)
   quantity: number;
+
+  @ApiProperty({ example: '100ml', required: false })
+  @IsString()
+  size?: string;
 }
 
 export class CreateOrderDto {
