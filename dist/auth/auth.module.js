@@ -10,6 +10,7 @@ exports.AuthModule = void 0;
 const common_1 = require("@nestjs/common");
 const passport_1 = require("@nestjs/passport");
 const jwt_1 = require("@nestjs/jwt");
+const config_1 = require("@nestjs/config");
 const auth_service_1 = require("./auth.service");
 const auth_controller_1 = require("./auth.controller");
 const jwt_strategy_1 = require("./jwt.strategy");
@@ -18,7 +19,26 @@ let AuthModule = class AuthModule {
 };
 AuthModule = __decorate([
     (0, common_1.Module)({
-        imports: [admin_module_1.AdminsModule, passport_1.PassportModule, jwt_1.JwtModule.register({})],
+        imports: [
+            admin_module_1.AdminsModule,
+            passport_1.PassportModule,
+            jwt_1.JwtModule.registerAsync({
+                imports: [config_1.ConfigModule],
+                inject: [config_1.ConfigService],
+                useFactory: (configService) => {
+                    const secret = configService.get('JWT_SECRET');
+                    if (!secret) {
+                        throw new Error('Missing JWT_SECRET environment variable. Add it to your .env file.');
+                    }
+                    return {
+                        secret,
+                        signOptions: {
+                            expiresIn: configService.get('JWT_EXPIRES_IN') || '7d',
+                        },
+                    };
+                },
+            }),
+        ],
         controllers: [auth_controller_1.AuthController],
         providers: [auth_service_1.AuthService, jwt_strategy_1.JwtStrategy],
         exports: [jwt_1.JwtModule],

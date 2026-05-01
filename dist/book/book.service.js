@@ -14,42 +14,42 @@ var __param = (this && this.__param) || function (paramIndex, decorator) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.BookService = void 0;
 const common_1 = require("@nestjs/common");
-const mongoose_1 = require("@nestjs/mongoose");
-const mongoose = require("mongoose");
+const typeorm_1 = require("@nestjs/typeorm");
+const typeorm_2 = require("typeorm");
 const book_schema_1 = require("./schemas/book.schema");
 let BookService = class BookService {
-    constructor(bookModel) {
-        this.bookModel = bookModel;
+    constructor(bookRepository) {
+        this.bookRepository = bookRepository;
     }
     async findAll() {
-        const books = await this.bookModel.find();
-        return books;
+        return this.bookRepository.find();
     }
     async create(book) {
-        const res = await this.bookModel.create(book);
-        return res;
+        const created = this.bookRepository.create(book);
+        return this.bookRepository.save(created);
     }
     async findById(id) {
-        const book = await this.bookModel.findById(id);
+        const book = await this.bookRepository.findOne({ where: { id } });
         if (!book) {
             throw new common_1.NotFoundException('Book not found.');
         }
         return book;
     }
     async updateById(id, book) {
-        return await this.bookModel.findByIdAndUpdate(id, book, {
-            new: true,
-            runValidators: true,
-        });
+        const existing = await this.findById(id);
+        const merged = this.bookRepository.merge(existing, book);
+        return this.bookRepository.save(merged);
     }
     async deleteById(id) {
-        return await this.bookModel.findByIdAndDelete(id);
+        const existing = await this.findById(id);
+        await this.bookRepository.delete(id);
+        return existing;
     }
 };
 BookService = __decorate([
     (0, common_1.Injectable)(),
-    __param(0, (0, mongoose_1.InjectModel)(book_schema_1.Book.name)),
-    __metadata("design:paramtypes", [mongoose.Model])
+    __param(0, (0, typeorm_1.InjectRepository)(book_schema_1.Book)),
+    __metadata("design:paramtypes", [typeorm_2.Repository])
 ], BookService);
 exports.BookService = BookService;
 //# sourceMappingURL=book.service.js.map

@@ -1,5 +1,5 @@
-import { Model } from 'mongoose';
-import { Product, ProductDocument } from './schemas/product.schema';
+import { Repository } from 'typeorm';
+import { Product } from './schemas/product.schema';
 import { CreateProductDto } from './dto/create-product.dto';
 import { UpdateProductDto } from './dto/update-product.dto';
 interface ProductFilters {
@@ -10,8 +10,8 @@ interface ProductFilters {
     size?: string;
 }
 export declare class ProductService {
-    private productModel;
-    constructor(productModel: Model<ProductDocument>);
+    private readonly productRepository;
+    constructor(productRepository: Repository<Product>);
     findAll(): Promise<Product[]>;
     findWithFilters(filters: ProductFilters): Promise<Product[]>;
     findById(id: string): Promise<Product>;

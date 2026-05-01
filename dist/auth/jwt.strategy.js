@@ -12,14 +12,20 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.JwtStrategy = void 0;
 const common_1 = require("@nestjs/common");
 const passport_1 = require("@nestjs/passport");
+const config_1 = require("@nestjs/config");
 const passport_jwt_1 = require("passport-jwt");
 let JwtStrategy = class JwtStrategy extends (0, passport_1.PassportStrategy)(passport_jwt_1.Strategy) {
-    constructor() {
+    constructor(configService) {
+        const secret = configService.get('JWT_SECRET');
+        if (!secret) {
+            throw new Error('Missing JWT_SECRET environment variable. Add it to your .env file.');
+        }
         super({
-            secretOrKey: process.env.JWT_SECRET,
+            secretOrKey: secret,
             jwtFromRequest: passport_jwt_1.ExtractJwt.fromAuthHeaderAsBearerToken(),
             ignoreExpiration: false,
         });
+        this.configService = configService;
     }
     async validate(payload) {
         return {
@@ -31,7 +37,7 @@ let JwtStrategy = class JwtStrategy extends (0, passport_1.PassportStrategy)(pas
 };
 JwtStrategy = __decorate([
     (0, common_1.Injectable)(),
-    __metadata("design:paramtypes", [])
+    __metadata("design:paramtypes", [config_1.ConfigService])
 ], JwtStrategy);
 exports.JwtStrategy = JwtStrategy;
 //# sourceMappingURL=jwt.strategy.js.map

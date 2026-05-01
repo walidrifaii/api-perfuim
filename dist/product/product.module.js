@@ -8,7 +8,7 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.ProductModule = void 0;
 const common_1 = require("@nestjs/common");
-const mongoose_1 = require("@nestjs/mongoose");
+const typeorm_1 = require("@nestjs/typeorm");
 const platform_express_1 = require("@nestjs/platform-express");
 const product_controller_1 = require("./product.controller");
 const public_product_controller_1 = require("./public-product.controller");
@@ -20,7 +20,7 @@ let ProductModule = class ProductModule {
 ProductModule = __decorate([
     (0, common_1.Module)({
         imports: [
-            mongoose_1.MongooseModule.forFeature([{ name: product_schema_1.Product.name, schema: product_schema_1.ProductSchema }]),
+            typeorm_1.TypeOrmModule.forFeature([product_schema_1.Product]),
             platform_express_1.MulterModule.register(),
             cloudinary_module_1.CloudinaryModule,
         ],

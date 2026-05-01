@@ -59,7 +59,7 @@ export class PublicProductController {
   // 🟢 Get a single product by ID
   @ApiOperation({ summary: 'Get a product by id (public)' })
   @ApiOkResponse({ description: 'Product returned' })
-  @ApiParam({ name: 'id', description: 'Product Mongo ObjectId' })
+  @ApiParam({ name: 'id', description: 'Product UUID' })
   @Get(':id')
   async getOne(@Param('id') id: string): Promise<Product> {
     return this.productService.findById(id);

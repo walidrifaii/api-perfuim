@@ -1,4 +1,4 @@
-import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
+import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
 
 export enum Category {
   ADVENTURE = 'Adventure',
@@ -7,24 +7,27 @@ export enum Category {
   FANTASY = 'Fantasy',
 }
 
-@Schema({
-  timestamps: true,
-})
+@Entity({ name: 'books' })
 export class Book {
-  @Prop()
+  @PrimaryGeneratedColumn('uuid')
+  id: string;
+
+  @Column()
   title: string;
 
-  @Prop()
+  @Column()
   description: string;
 
-  @Prop()
+  @Column()
   author: string;
 
-  @Prop()
+  @Column('float')
   price: number;
 
-  @Prop()
+  @Column({
+    type: 'enum',
+    enum: Category,
+    default: Category.ADVENTURE,
+  })
   category: Category;
 }
-
-export const BookSchema = SchemaFactory.createForClass(Book);

@@ -16,9 +16,19 @@ const resend_1 = require("resend");
 let MailerService = MailerService_1 = class MailerService {
     constructor() {
         this.logger = new common_1.Logger(MailerService_1.name);
-        this.resend = new resend_1.Resend(process.env.RESEND_API_KEY);
+        const resendApiKey = process.env.RESEND_API_KEY;
+        if (!resendApiKey) {
+            this.logger.warn('RESEND_API_KEY is not set; order emails will be skipped.');
+            this.resend = null;
+            return;
+        }
+        this.resend = new resend_1.Resend(resendApiKey);
     }
     async sendOrderEmail(subject, html) {
+        if (!this.resend) {
+            this.logger.warn('Email client is not configured; skipping email');
+            return;
+        }
         const to = process.env.ORDER_TO_EMAIL;
         if (!to) {
             this.logger.warn('ORDER_TO_EMAIL is not set; skipping email');

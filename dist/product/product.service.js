@@ -14,63 +14,63 @@ var __param = (this && this.__param) || function (paramIndex, decorator) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.ProductService = void 0;
 const common_1 = require("@nestjs/common");
-const mongoose_1 = require("@nestjs/mongoose");
-const mongoose_2 = require("mongoose");
+const typeorm_1 = require("@nestjs/typeorm");
+const typeorm_2 = require("typeorm");
 const product_schema_1 = require("./schemas/product.schema");
 let ProductService = class ProductService {
-    constructor(productModel) {
-        this.productModel = productModel;
+    constructor(productRepository) {
+        this.productRepository = productRepository;
     }
     async findAll() {
-        return this.productModel.find();
+        return this.productRepository.find();
     }
     async findWithFilters(filters) {
-        const query = { isActive: true };
+        const where = { isActive: true };
         if (filters.sex)
-            query.sex = filters.sex;
+            where.sex = filters.sex;
         if (filters.brand)
-            query.brand = filters.brand;
+            where.brand = filters.brand;
         if (filters.minPrice !== undefined)
-            query.price = Object.assign(Object.assign({}, query.price), { $gte: filters.minPrice });
+            where.price = (0, typeorm_2.MoreThanOrEqual)(filters.minPrice);
         if (filters.maxPrice !== undefined)
-            query.price = Object.assign(Object.assign({}, query.price), { $lte: filters.maxPrice });
-        if (filters.size)
-            query.size = filters.size;
-        return this.productModel.find(query).exec();
+            where.price =
+                filters.minPrice !== undefined
+                    ? (0, typeorm_2.Between)(filters.minPrice, filters.maxPrice)
+                    : (0, typeorm_2.LessThanOrEqual)(filters.maxPrice);
+        const products = await this.productRepository.find({ where });
+        if (filters.size) {
+            return products.filter((p) => { var _a; return (_a = p.size) === null || _a === void 0 ? void 0 : _a.includes(filters.size); });
+        }
+        return products;
     }
     async findById(id) {
-        if (!(0, mongoose_2.isValidObjectId)(id))
-            throw new common_1.NotFoundException('Product not found.');
-        const product = await this.productModel.findById(id);
+        const product = await this.productRepository.findOne({ where: { id } });
         if (!product)
             throw new common_1.NotFoundException('Product not found.');
         return product;
     }
     async create(dto) {
-        const created = await this.productModel.create(dto);
-        return created;
+        const created = this.productRepository.create(dto);
+        return this.productRepository.save(created);
     }
     async updateById(id, dto) {
-        if (!(0, mongoose_2.isValidObjectId)(id)) {
+        const product = await this.productRepository.findOne({ where: { id } });
+        if (!product) {
             throw new common_1.NotFoundException('Product not found.');
         }
-        const updated = await this.productModel.findByIdAndUpdate(id, dto, {
-            new: true,
-            runValidators: true,
-        });
-        if (!updated) {
-            throw new common_1.NotFoundException('Product not found.');
-        }
-        return updated;
+        const merged = this.productRepository.merge(product, dto);
+        return this.productRepository.save(merged);
     }
     async findBySex(sex) {
-        return this.productModel.find({ sex, isActive: true }).exec();
+        return this.productRepository.find({
+            where: { sex: sex, isActive: true },
+        });
     }
 };
 ProductService = __decorate([
     (0, common_1.Injectable)(),
-    __param(0, (0, mongoose_1.InjectModel)(product_schema_1.Product.name)),
-    __metadata("design:paramtypes", [mongoose_2.Model])
+    __param(0, (0, typeorm_1.InjectRepository)(product_schema_1.Product)),
+    __metadata("design:paramtypes", [typeorm_2.Repository])
 ], ProductService);
 exports.ProductService = ProductService;
 //# sourceMappingURL=product.service.js.map

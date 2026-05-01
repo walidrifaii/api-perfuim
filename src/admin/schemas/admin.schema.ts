@@ -1,20 +1,28 @@
-import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
-import { HydratedDocument, Types } from 'mongoose';
+import {
+  Column,
+  CreateDateColumn,
+  Entity,
+  PrimaryGeneratedColumn,
+  UpdateDateColumn,
+} from 'typeorm';
 
-export type AdminDocument = HydratedDocument<Admin>;
-
-@Schema({ timestamps: true })
+@Entity({ name: 'admins' })
 export class Admin {
-  _id!: Types.ObjectId;
+  @PrimaryGeneratedColumn('uuid')
+  id: string;
 
-  @Prop({ required: true, unique: true, lowercase: true, trim: true })
+  @Column({ unique: true })
   email: string;
 
-  @Prop({ required: true })
+  @Column()
   passwordHash: string;
 
-  @Prop({ default: true })
+  @Column({ default: true })
   isAdmin: boolean;
-}
 
-export const AdminSchema = SchemaFactory.createForClass(Admin);
+  @CreateDateColumn()
+  createdAt: Date;
+
+  @UpdateDateColumn()
+  updatedAt: Date;
+}

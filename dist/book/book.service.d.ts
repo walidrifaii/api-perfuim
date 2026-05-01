@@ -1,11 +1,13 @@
-import * as mongoose from 'mongoose';
+import { Repository } from 'typeorm';
 import { Book } from './schemas/book.schema';
+import { CreateBookDto } from './dto/create-book.dto';
+import { UpdateBookDto } from './dto/update-book.dto';
 export declare class BookService {
-    private bookModel;
-    constructor(bookModel: mongoose.Model<Book>);
+    private readonly bookRepository;
+    constructor(bookRepository: Repository<Book>);
     findAll(): Promise<Book[]>;
-    create(book: Book): Promise<Book>;
+    create(book: CreateBookDto): Promise<Book>;
     findById(id: string): Promise<Book>;
-    updateById(id: string, book: Book): Promise<Book>;
+    updateById(id: string, book: UpdateBookDto): Promise<Book>;
     deleteById(id: string): Promise<Book>;
 }

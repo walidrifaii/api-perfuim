@@ -1,42 +1,51 @@
-import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
-import { Document } from 'mongoose';
+import {
+  Column,
+  CreateDateColumn,
+  Entity,
+  PrimaryGeneratedColumn,
+  UpdateDateColumn,
+} from 'typeorm';
 import { ProductSex } from '../dto/create-product.dto'; // ✅ reuse the same enum
 
-export type ProductDocument = Product & Document;
-
-@Schema({ timestamps: true })
+@Entity({ name: 'products' })
 export class Product {
-  @Prop({ required: true, trim: true })
+  @PrimaryGeneratedColumn('uuid')
+  id: string;
+
+  @Column()
   name: string;
 
-  @Prop({ required: true, trim: true })
+  @Column()
   brand: string;
 
-  @Prop({ required: true, min: 0 })
+  @Column('float')
   price: number;
 
-  @Prop({ default: '' })
+  @Column({ default: '' })
   description: string;
 
-  @Prop({ type: [String], default: [] })
+  @Column('simple-array', { default: '' })
   size: string[];
 
-  // ✅ Updated enum values here too
-  @Prop({
-    required: true,
+  @Column({
+    type: 'enum',
     enum: Object.values(ProductSex),
     default: ProductSex.UNISEX,
   })
   sex: ProductSex;
 
-  @Prop({ default: true })
+  @Column({ default: true })
   isActive: boolean;
 
-  @Prop({ default: '' })
+  @Column({ default: '' })
   image: string;
 
-  @Prop({ required: true, min: 0, default: 0 })
+  @Column({ type: 'int', default: 0 })
   quantity: number;
-}
 
-export const ProductSchema = SchemaFactory.createForClass(Product);
+  @CreateDateColumn()
+  createdAt: Date;
+
+  @UpdateDateColumn()
+  updatedAt: Date;
+}

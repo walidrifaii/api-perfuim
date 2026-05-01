@@ -9,25 +9,36 @@ var __metadata = (this && this.__metadata) || function (k, v) {
     if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.AdminSchema = exports.Admin = void 0;
-const mongoose_1 = require("@nestjs/mongoose");
+exports.Admin = void 0;
+const typeorm_1 = require("typeorm");
 let Admin = class Admin {
 };
 __decorate([
-    (0, mongoose_1.Prop)({ required: true, unique: true, lowercase: true, trim: true }),
+    (0, typeorm_1.PrimaryGeneratedColumn)('uuid'),
+    __metadata("design:type", String)
+], Admin.prototype, "id", void 0);
+__decorate([
+    (0, typeorm_1.Column)({ unique: true }),
     __metadata("design:type", String)
 ], Admin.prototype, "email", void 0);
 __decorate([
-    (0, mongoose_1.Prop)({ required: true }),
+    (0, typeorm_1.Column)(),
     __metadata("design:type", String)
 ], Admin.prototype, "passwordHash", void 0);
 __decorate([
-    (0, mongoose_1.Prop)({ default: true }),
+    (0, typeorm_1.Column)({ default: true }),
     __metadata("design:type", Boolean)
 ], Admin.prototype, "isAdmin", void 0);
+__decorate([
+    (0, typeorm_1.CreateDateColumn)(),
+    __metadata("design:type", Date)
+], Admin.prototype, "createdAt", void 0);
+__decorate([
+    (0, typeorm_1.UpdateDateColumn)(),
+    __metadata("design:type", Date)
+], Admin.prototype, "updatedAt", void 0);
 Admin = __decorate([
-    (0, mongoose_1.Schema)({ timestamps: true })
+    (0, typeorm_1.Entity)({ name: 'admins' })
 ], Admin);
 exports.Admin = Admin;
-exports.AdminSchema = mongoose_1.SchemaFactory.createForClass(Admin);
 //# sourceMappingURL=admin.schema.js.map

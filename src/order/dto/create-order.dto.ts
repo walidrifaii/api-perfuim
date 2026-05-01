@@ -13,7 +13,7 @@ import {
 import { Type } from 'class-transformer';
 
 class OrderItemDto {
-  @ApiProperty({ example: '66f3c5b2d0e2ec3f55e7babc' })
+  @ApiProperty({ example: 'c70d6d6b-f3db-4642-b0f8-a79437cd03f8' })
   @IsString()
   @IsNotEmpty()
   productId: string;

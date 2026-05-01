@@ -9,8 +9,8 @@ var __metadata = (this && this.__metadata) || function (k, v) {
     if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.BookSchema = exports.Book = exports.Category = void 0;
-const mongoose_1 = require("@nestjs/mongoose");
+exports.Book = exports.Category = void 0;
+const typeorm_1 = require("typeorm");
 var Category;
 (function (Category) {
     Category["ADVENTURE"] = "Adventure";
@@ -21,30 +21,35 @@ var Category;
 let Book = class Book {
 };
 __decorate([
-    (0, mongoose_1.Prop)(),
+    (0, typeorm_1.PrimaryGeneratedColumn)('uuid'),
+    __metadata("design:type", String)
+], Book.prototype, "id", void 0);
+__decorate([
+    (0, typeorm_1.Column)(),
     __metadata("design:type", String)
 ], Book.prototype, "title", void 0);
 __decorate([
-    (0, mongoose_1.Prop)(),
+    (0, typeorm_1.Column)(),
     __metadata("design:type", String)
 ], Book.prototype, "description", void 0);
 __decorate([
-    (0, mongoose_1.Prop)(),
+    (0, typeorm_1.Column)(),
     __metadata("design:type", String)
 ], Book.prototype, "author", void 0);
 __decorate([
-    (0, mongoose_1.Prop)(),
+    (0, typeorm_1.Column)('float'),
     __metadata("design:type", Number)
 ], Book.prototype, "price", void 0);
 __decorate([
-    (0, mongoose_1.Prop)(),
+    (0, typeorm_1.Column)({
+        type: 'enum',
+        enum: Category,
+        default: Category.ADVENTURE,
+    }),
     __metadata("design:type", String)
 ], Book.prototype, "category", void 0);
 Book = __decorate([
-    (0, mongoose_1.Schema)({
-        timestamps: true,
-    })
+    (0, typeorm_1.Entity)({ name: 'books' })
 ], Book);
 exports.Book = Book;
-exports.BookSchema = mongoose_1.SchemaFactory.createForClass(Book);
 //# sourceMappingURL=book.schema.js.map

@@ -16,7 +16,7 @@ const class_transformer_1 = require("class-transformer");
 class OrderItemDto {
 }
 __decorate([
-    (0, swagger_1.ApiProperty)({ example: '66f3c5b2d0e2ec3f55e7babc' }),
+    (0, swagger_1.ApiProperty)({ example: 'c70d6d6b-f3db-4642-b0f8-a79437cd03f8' }),
     (0, class_validator_1.IsString)(),
     (0, class_validator_1.IsNotEmpty)(),
     __metadata("design:type", String)

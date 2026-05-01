@@ -1,71 +1,61 @@
-import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
-import { HydratedDocument, Types } from 'mongoose';
+import {
+  Column,
+  CreateDateColumn,
+  Entity,
+  PrimaryGeneratedColumn,
+  UpdateDateColumn,
+} from 'typeorm';
 
-export type OrderDocument = HydratedDocument<Order>;
-
-/** Subdocument for items */
-@Schema({ _id: false }) // no separate _id for each item
-class OrderItem {
-  @Prop({ type: Types.ObjectId, ref: 'Product', required: true })
-  productId: Types.ObjectId;
-
-  @Prop({ required: true, min: 1 })
+export interface OrderItem {
+  productId: string;
   quantity: number;
-
-  @Prop({ required: true, min: 0 })
   unitPrice: number;
-
-  @Prop({ required: true, min: 0 })
   lineTotal: number;
-
-  // snapshots (optional but useful)
-  @Prop({ default: '' })
   name?: string;
-
-  @Prop({ default: '' })
   brand?: string;
-
-  @Prop({ type: [String], default: [] })
-  size: string[];
+  size?: string;
 }
-const OrderItemSchema = SchemaFactory.createForClass(OrderItem);
 
-@Schema({ timestamps: true })
+@Entity({ name: 'orders' })
 export class Order {
-  _id!: Types.ObjectId;
+  @PrimaryGeneratedColumn('uuid')
+  id: string;
 
-  // customer
-  @Prop({ required: true }) customerName: string;
-  @Prop({ required: true }) customerPhone: string;
-  @Prop({ required: true }) customerEmail: string;
+  @Column()
+  customerName: string;
+  @Column()
+  customerPhone: string;
+  @Column()
+  customerEmail: string;
 
-  // address
-  @Prop({ required: true }) addressLine1: string;
-  @Prop({ default: '' }) addressLine2: string;
-  @Prop({ required: true }) city: string;
+  @Column()
+  addressLine1: string;
+  @Column({ default: '' })
+  addressLine2: string;
+  @Column()
+  city: string;
 
-  @Prop({ default: '' }) notes: string;
+  @Column({ default: '' })
+  notes: string;
 
-  // payment: Cash on Delivery only
-  @Prop({ required: true, enum: ['COD'], default: 'COD' })
+  @Column({ type: 'varchar', default: 'COD' })
   paymentMethod: 'COD';
 
-  // items (array of subdocuments)
-  @Prop({ type: [OrderItemSchema], default: [] })
+  @Column({ type: 'jsonb', default: () => "'[]'" })
   items: OrderItem[];
 
-  // totals
-  @Prop({ required: true, min: 0 })
+  @Column('float')
   subtotal: number;
 
-  @Prop({ required: true, min: 0 })
+  @Column('float')
   total: number;
 
-  @Prop({
-    default: 'placed',
-    enum: ['placed', 'confirmed', 'shipped', 'delivered', 'cancelled'],
-  })
+  @Column({ default: 'placed' })
   status: string;
-}
 
-export const OrderSchema = SchemaFactory.createForClass(Order);
+  @CreateDateColumn()
+  createdAt: Date;
+
+  @UpdateDateColumn()
+  updatedAt: Date;
+}

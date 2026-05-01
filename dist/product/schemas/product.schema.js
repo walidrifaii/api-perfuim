@@ -9,54 +9,65 @@ var __metadata = (this && this.__metadata) || function (k, v) {
     if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.ProductSchema = exports.Product = void 0;
-const mongoose_1 = require("@nestjs/mongoose");
+exports.Product = void 0;
+const typeorm_1 = require("typeorm");
 const create_product_dto_1 = require("../dto/create-product.dto");
 let Product = class Product {
 };
 __decorate([
-    (0, mongoose_1.Prop)({ required: true, trim: true }),
+    (0, typeorm_1.PrimaryGeneratedColumn)('uuid'),
+    __metadata("design:type", String)
+], Product.prototype, "id", void 0);
+__decorate([
+    (0, typeorm_1.Column)(),
     __metadata("design:type", String)
 ], Product.prototype, "name", void 0);
 __decorate([
-    (0, mongoose_1.Prop)({ required: true, trim: true }),
+    (0, typeorm_1.Column)(),
     __metadata("design:type", String)
 ], Product.prototype, "brand", void 0);
 __decorate([
-    (0, mongoose_1.Prop)({ required: true, min: 0 }),
+    (0, typeorm_1.Column)('float'),
     __metadata("design:type", Number)
 ], Product.prototype, "price", void 0);
 __decorate([
-    (0, mongoose_1.Prop)({ default: '' }),
+    (0, typeorm_1.Column)({ default: '' }),
     __metadata("design:type", String)
 ], Product.prototype, "description", void 0);
 __decorate([
-    (0, mongoose_1.Prop)({ type: [String], default: [] }),
+    (0, typeorm_1.Column)('simple-array', { default: '' }),
     __metadata("design:type", Array)
 ], Product.prototype, "size", void 0);
 __decorate([
-    (0, mongoose_1.Prop)({
-        required: true,
+    (0, typeorm_1.Column)({
+        type: 'enum',
         enum: Object.values(create_product_dto_1.ProductSex),
         default: create_product_dto_1.ProductSex.UNISEX,
     }),
     __metadata("design:type", String)
 ], Product.prototype, "sex", void 0);
 __decorate([
-    (0, mongoose_1.Prop)({ default: true }),
+    (0, typeorm_1.Column)({ default: true }),
     __metadata("design:type", Boolean)
 ], Product.prototype, "isActive", void 0);
 __decorate([
-    (0, mongoose_1.Prop)({ default: '' }),
+    (0, typeorm_1.Column)({ default: '' }),
     __metadata("design:type", String)
 ], Product.prototype, "image", void 0);
 __decorate([
-    (0, mongoose_1.Prop)({ required: true, min: 0, default: 0 }),
+    (0, typeorm_1.Column)({ type: 'int', default: 0 }),
     __metadata("design:type", Number)
 ], Product.prototype, "quantity", void 0);
+__decorate([
+    (0, typeorm_1.CreateDateColumn)(),
+    __metadata("design:type", Date)
+], Product.prototype, "createdAt", void 0);
+__decorate([
+    (0, typeorm_1.UpdateDateColumn)(),
+    __metadata("design:type", Date)
+], Product.prototype, "updatedAt", void 0);
 Product = __decorate([
-    (0, mongoose_1.Schema)({ timestamps: true })
+    (0, typeorm_1.Entity)({ name: 'products' })
 ], Product);
 exports.Product = Product;
-exports.ProductSchema = mongoose_1.SchemaFactory.createForClass(Product);
 //# sourceMappingURL=product.schema.js.map

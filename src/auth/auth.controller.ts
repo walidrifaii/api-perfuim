@@ -15,7 +15,7 @@ export class AuthController {
   async registerAdmin(@Body() dto: RegisterAdminDto) {
     const admin = await this.admins.createAdmin(dto.email, dto.password);
     return {
-      id: String(admin._id),
+      id: admin.id,
       email: admin.email,
       isAdmin: admin.isAdmin,
     };

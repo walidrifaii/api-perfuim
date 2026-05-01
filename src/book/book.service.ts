@@ -1,27 +1,28 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
-import { InjectModel } from '@nestjs/mongoose';
-import * as mongoose from 'mongoose';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
 import { Book } from './schemas/book.schema';
+import { CreateBookDto } from './dto/create-book.dto';
+import { UpdateBookDto } from './dto/update-book.dto';
 
 @Injectable()
 export class BookService {
   constructor(
-    @InjectModel(Book.name)
-    private bookModel: mongoose.Model<Book>,
+    @InjectRepository(Book)
+    private readonly bookRepository: Repository<Book>,
   ) {}
 
   async findAll(): Promise<Book[]> {
-    const books = await this.bookModel.find();
-    return books;
+    return this.bookRepository.find();
   }
 
-  async create(book: Book): Promise<Book> {
-    const res = await this.bookModel.create(book);
-    return res;
+  async create(book: CreateBookDto): Promise<Book> {
+    const created = this.bookRepository.create(book);
+    return this.bookRepository.save(created);
   }
 
   async findById(id: string): Promise<Book> {
-    const book = await this.bookModel.findById(id);
+    const book = await this.bookRepository.findOne({ where: { id } });
 
     if (!book) {
       throw new NotFoundException('Book not found.');
@@ -30,14 +31,15 @@ export class BookService {
     return book;
   }
 
-  async updateById(id: string, book: Book): Promise<Book> {
-    return await this.bookModel.findByIdAndUpdate(id, book, {
-      new: true,
-      runValidators: true,
-    });
+  async updateById(id: string, book: UpdateBookDto): Promise<Book> {
+    const existing = await this.findById(id);
+    const merged = this.bookRepository.merge(existing, book);
+    return this.bookRepository.save(merged);
   }
 
   async deleteById(id: string): Promise<Book> {
-    return await this.bookModel.findByIdAndDelete(id);
+    const existing = await this.findById(id);
+    await this.bookRepository.delete(id);
+    return existing;
   }
 }

@@ -9,99 +9,72 @@ var __metadata = (this && this.__metadata) || function (k, v) {
     if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.OrderSchema = exports.Order = void 0;
-const mongoose_1 = require("@nestjs/mongoose");
-const mongoose_2 = require("mongoose");
-let OrderItem = class OrderItem {
-};
-__decorate([
-    (0, mongoose_1.Prop)({ type: mongoose_2.Types.ObjectId, ref: 'Product', required: true }),
-    __metadata("design:type", mongoose_2.Types.ObjectId)
-], OrderItem.prototype, "productId", void 0);
-__decorate([
-    (0, mongoose_1.Prop)({ required: true, min: 1 }),
-    __metadata("design:type", Number)
-], OrderItem.prototype, "quantity", void 0);
-__decorate([
-    (0, mongoose_1.Prop)({ required: true, min: 0 }),
-    __metadata("design:type", Number)
-], OrderItem.prototype, "unitPrice", void 0);
-__decorate([
-    (0, mongoose_1.Prop)({ required: true, min: 0 }),
-    __metadata("design:type", Number)
-], OrderItem.prototype, "lineTotal", void 0);
-__decorate([
-    (0, mongoose_1.Prop)({ default: '' }),
-    __metadata("design:type", String)
-], OrderItem.prototype, "name", void 0);
-__decorate([
-    (0, mongoose_1.Prop)({ default: '' }),
-    __metadata("design:type", String)
-], OrderItem.prototype, "brand", void 0);
-__decorate([
-    (0, mongoose_1.Prop)({ type: [String], default: [] }),
-    __metadata("design:type", Array)
-], OrderItem.prototype, "size", void 0);
-OrderItem = __decorate([
-    (0, mongoose_1.Schema)({ _id: false })
-], OrderItem);
-const OrderItemSchema = mongoose_1.SchemaFactory.createForClass(OrderItem);
+exports.Order = void 0;
+const typeorm_1 = require("typeorm");
 let Order = class Order {
 };
 __decorate([
-    (0, mongoose_1.Prop)({ required: true }),
+    (0, typeorm_1.PrimaryGeneratedColumn)('uuid'),
+    __metadata("design:type", String)
+], Order.prototype, "id", void 0);
+__decorate([
+    (0, typeorm_1.Column)(),
     __metadata("design:type", String)
 ], Order.prototype, "customerName", void 0);
 __decorate([
-    (0, mongoose_1.Prop)({ required: true }),
+    (0, typeorm_1.Column)(),
     __metadata("design:type", String)
 ], Order.prototype, "customerPhone", void 0);
 __decorate([
-    (0, mongoose_1.Prop)({ required: true }),
+    (0, typeorm_1.Column)(),
     __metadata("design:type", String)
 ], Order.prototype, "customerEmail", void 0);
 __decorate([
-    (0, mongoose_1.Prop)({ required: true }),
+    (0, typeorm_1.Column)(),
     __metadata("design:type", String)
 ], Order.prototype, "addressLine1", void 0);
 __decorate([
-    (0, mongoose_1.Prop)({ default: '' }),
+    (0, typeorm_1.Column)({ default: '' }),
     __metadata("design:type", String)
 ], Order.prototype, "addressLine2", void 0);
 __decorate([
-    (0, mongoose_1.Prop)({ required: true }),
+    (0, typeorm_1.Column)(),
     __metadata("design:type", String)
 ], Order.prototype, "city", void 0);
 __decorate([
-    (0, mongoose_1.Prop)({ default: '' }),
+    (0, typeorm_1.Column)({ default: '' }),
     __metadata("design:type", String)
 ], Order.prototype, "notes", void 0);
 __decorate([
-    (0, mongoose_1.Prop)({ required: true, enum: ['COD'], default: 'COD' }),
+    (0, typeorm_1.Column)({ type: 'varchar', default: 'COD' }),
     __metadata("design:type", String)
 ], Order.prototype, "paymentMethod", void 0);
 __decorate([
-    (0, mongoose_1.Prop)({ type: [OrderItemSchema], default: [] }),
+    (0, typeorm_1.Column)({ type: 'jsonb', default: () => "'[]'" }),
     __metadata("design:type", Array)
 ], Order.prototype, "items", void 0);
 __decorate([
-    (0, mongoose_1.Prop)({ required: true, min: 0 }),
+    (0, typeorm_1.Column)('float'),
     __metadata("design:type", Number)
 ], Order.prototype, "subtotal", void 0);
 __decorate([
-    (0, mongoose_1.Prop)({ required: true, min: 0 }),
+    (0, typeorm_1.Column)('float'),
     __metadata("design:type", Number)
 ], Order.prototype, "total", void 0);
 __decorate([
-    (0, mongoose_1.Prop)({
-        default: 'placed',
-        enum: ['placed', 'confirmed', 'shipped', 'delivered', 'cancelled'],
-    }),
+    (0, typeorm_1.Column)({ default: 'placed' }),
     __metadata("design:type", String)
 ], Order.prototype, "status", void 0);
+__decorate([
+    (0, typeorm_1.CreateDateColumn)(),
+    __metadata("design:type", Date)
+], Order.prototype, "createdAt", void 0);
+__decorate([
+    (0, typeorm_1.UpdateDateColumn)(),
+    __metadata("design:type", Date)
+], Order.prototype, "updatedAt", void 0);
 Order = __decorate([
-    (0, mongoose_1.Schema)({ timestamps: true })
+    (0, typeorm_1.Entity)({ name: 'orders' })
 ], Order);
 exports.Order = Order;
-exports.OrderSchema = mongoose_1.SchemaFactory.createForClass(Order);
 //# sourceMappingURL=order.schema.js.map

@@ -14,23 +14,25 @@ var __param = (this && this.__param) || function (paramIndex, decorator) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.AdminsService = void 0;
 const common_1 = require("@nestjs/common");
-const mongoose_1 = require("@nestjs/mongoose");
-const mongoose_2 = require("mongoose");
+const typeorm_1 = require("@nestjs/typeorm");
+const typeorm_2 = require("typeorm");
 const bcrypt = require("bcryptjs");
 const admin_schema_1 = require("./schemas/admin.schema");
 let AdminsService = class AdminsService {
-    constructor(adminModel) {
-        this.adminModel = adminModel;
+    constructor(adminRepository) {
+        this.adminRepository = adminRepository;
     }
     async createAdmin(email, password) {
-        const exists = await this.adminModel.findOne({ email });
+        const exists = await this.adminRepository.findOne({ where: { email } });
         if (exists)
             throw new common_1.BadRequestException('Admin already exists with this email');
         const passwordHash = await bcrypt.hash(password, 10);
-        return this.adminModel.create({ email, passwordHash, isAdmin: true });
+        return this.adminRepository.save({ email, passwordHash, isAdmin: true });
     }
     async validateAdmin(email, password) {
-        const admin = await this.adminModel.findOne({ email, isAdmin: true });
+        const admin = await this.adminRepository.findOne({
+            where: { email, isAdmin: true },
+        });
         if (!admin)
             throw new common_1.UnauthorizedException('Invalid credentials');
         const ok = await bcrypt.compare(password, admin.passwordHash);
@@ -39,13 +41,13 @@ let AdminsService = class AdminsService {
         return admin;
     }
     async findById(id) {
-        return this.adminModel.findById(id);
+        return this.adminRepository.findOne({ where: { id } });
     }
 };
 AdminsService = __decorate([
     (0, common_1.Injectable)(),
-    __param(0, (0, mongoose_1.InjectModel)(admin_schema_1.Admin.name)),
-    __metadata("design:paramtypes", [mongoose_2.Model])
+    __param(0, (0, typeorm_1.InjectRepository)(admin_schema_1.Admin)),
+    __metadata("design:paramtypes", [typeorm_2.Repository])
 ], AdminsService);
 exports.AdminsService = AdminsService;
 //# sourceMappingURL=admin.service.js.map

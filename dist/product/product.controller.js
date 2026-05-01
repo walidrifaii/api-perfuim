@@ -92,7 +92,7 @@ __decorate([
         summary: 'Update a product by id (optional image upload to Cloudinary)',
     }),
     (0, swagger_1.ApiOkResponse)({ description: 'Product updated successfully' }),
-    (0, swagger_1.ApiParam)({ name: 'id', description: 'Product Mongo ObjectId' }),
+    (0, swagger_1.ApiParam)({ name: 'id', description: 'Product UUID' }),
     (0, swagger_1.ApiConsumes)('multipart/form-data'),
     (0, swagger_1.ApiBody)({
         schema: {

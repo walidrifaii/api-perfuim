@@ -92,7 +92,7 @@ export class ProductController {
     summary: 'Update a product by id (optional image upload to Cloudinary)',
   })
   @ApiOkResponse({ description: 'Product updated successfully' })
-  @ApiParam({ name: 'id', description: 'Product Mongo ObjectId' })
+  @ApiParam({ name: 'id', description: 'Product UUID' })
   @ApiConsumes('multipart/form-data')
   @ApiBody({
     schema: {

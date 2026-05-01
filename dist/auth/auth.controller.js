@@ -27,7 +27,7 @@ let AuthController = class AuthController {
     async registerAdmin(dto) {
         const admin = await this.admins.createAdmin(dto.email, dto.password);
         return {
-            id: String(admin._id),
+            id: admin.id,
             email: admin.email,
             isAdmin: admin.isAdmin,
         };

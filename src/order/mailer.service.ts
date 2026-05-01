@@ -4,13 +4,27 @@ import { Resend } from 'resend';
 @Injectable()
 export class MailerService {
   private readonly logger = new Logger(MailerService.name);
-  private readonly resend: Resend;
+  private readonly resend: Resend | null;
 
   constructor() {
-    this.resend = new Resend(process.env.RESEND_API_KEY);
+    const resendApiKey = process.env.RESEND_API_KEY;
+    if (!resendApiKey) {
+      this.logger.warn(
+        'RESEND_API_KEY is not set; order emails will be skipped.',
+      );
+      this.resend = null;
+      return;
+    }
+
+    this.resend = new Resend(resendApiKey);
   }
 
   async sendOrderEmail(subject: string, html: string) {
+    if (!this.resend) {
+      this.logger.warn('Email client is not configured; skipping email');
+      return;
+    }
+
     const to = process.env.ORDER_TO_EMAIL;
     if (!to) {
       this.logger.warn('ORDER_TO_EMAIL is not set; skipping email');

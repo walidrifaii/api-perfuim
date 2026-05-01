@@ -21,14 +21,11 @@ let AuthService = class AuthService {
     async login(email, password) {
         const admin = await this.admins.validateAdmin(email, password);
         const payload = {
-            sub: String(admin._id),
+            sub: admin.id,
             email: admin.email,
             isAdmin: true,
         };
-        const access_token = await this.jwt.signAsync(payload, {
-            secret: process.env.JWT_SECRET,
-            expiresIn: process.env.JWT_EXPIRES_IN || '7d',
-        });
+        const access_token = await this.jwt.signAsync(payload);
         return { access_token };
     }
 };

@@ -78,7 +78,7 @@ __decorate([
 __decorate([
     (0, swagger_1.ApiOperation)({ summary: 'Get a product by id (public)' }),
     (0, swagger_1.ApiOkResponse)({ description: 'Product returned' }),
-    (0, swagger_1.ApiParam)({ name: 'id', description: 'Product Mongo ObjectId' }),
+    (0, swagger_1.ApiParam)({ name: 'id', description: 'Product UUID' }),
     (0, common_1.Get)(':id'),
     __param(0, (0, common_1.Param)('id')),
     __metadata("design:type", Function),

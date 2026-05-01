@@ -9,18 +9,39 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.AppModule = void 0;
 const common_1 = require("@nestjs/common");
 const config_1 = require("@nestjs/config");
-const mongoose_1 = require("@nestjs/mongoose");
+const typeorm_1 = require("@nestjs/typeorm");
 const product_module_1 = require("./product/product.module");
 const auth_module_1 = require("./auth/auth.module");
 const admin_module_1 = require("./admin/admin.module");
 const order_module_1 = require("./order/order.module");
+const product_schema_1 = require("./product/schemas/product.schema");
+const admin_schema_1 = require("./admin/schemas/admin.schema");
+const order_schema_1 = require("./order/schemas/order.schema");
+const book_schema_1 = require("./book/schemas/book.schema");
 let AppModule = class AppModule {
 };
 AppModule = __decorate([
     (0, common_1.Module)({
         imports: [
             config_1.ConfigModule.forRoot({ isGlobal: true }),
-            mongoose_1.MongooseModule.forRoot(process.env.DB_URI),
+            typeorm_1.TypeOrmModule.forRootAsync({
+                imports: [config_1.ConfigModule],
+                inject: [config_1.ConfigService],
+                useFactory: (configService) => {
+                    const postgresUrl = configService.get('DATABASE_URL') ||
+                        configService.get('DB_URI');
+                    if (!postgresUrl) {
+                        throw new Error('Missing DATABASE_URL (or DB_URI) environment variable. Add it to your .env file.');
+                    }
+                    return {
+                        type: 'postgres',
+                        url: postgresUrl,
+                        entities: [product_schema_1.Product, admin_schema_1.Admin, order_schema_1.Order, book_schema_1.Book],
+                        synchronize: true,
+                        ssl: process.env.NODE_ENV === 'production' ? { rejectUnauthorized: false } : false,
+                    };
+                },
+            }),
             admin_module_1.AdminsModule,
             auth_module_1.AuthModule,
             product_module_1.ProductModule,
