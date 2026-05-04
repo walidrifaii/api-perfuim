@@ -1,5 +1,6 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import {
+  ArrayMinSize,
   IsArray,
   IsBoolean,
   IsEnum,
@@ -7,8 +8,10 @@ import {
   IsOptional,
   IsString,
   Min,
+  ValidateNested,
 } from 'class-validator';
-import { Transform, Type } from 'class-transformer';
+import { plainToInstance, Transform, Type } from 'class-transformer';
+import { SizePriceDto } from './size-price.dto';
 
 // ✅ Updated enum
 export enum ProductSex {
@@ -25,30 +28,41 @@ export class CreateProductDto {
   @IsString()
   brand: string;
 
-  @ApiProperty({ example: 29.99, minimum: 0 })
-  @Type(() => Number)
-  @IsNumber()
-  @Min(0)
-  price: number;
+  @ApiProperty({
+    description: 'Each variant: size label and its price (JSON array or multipart string)',
+    type: [SizePriceDto],
+    example: [
+      { size: '100 ml', price: 19.99 },
+      { size: '200 ml', price: 34.99 },
+    ],
+  })
+  @Transform(({ value }) => {
+    if (value == null || value === '') return undefined;
+    let raw: unknown = value;
+    if (typeof value === 'string') {
+      try {
+        const parsed = JSON.parse(value);
+        raw = Array.isArray(parsed) ? parsed : [parsed];
+      } catch {
+        return value;
+      }
+    }
+    if (!Array.isArray(raw)) return raw;
+    // Instances required so @ValidateNested({ each: true }) runs per-item validators
+    return raw.map((item) =>
+      plainToInstance(SizePriceDto, item, { enableImplicitConversion: true }),
+    );
+  })
+  @IsArray()
+  @ArrayMinSize(1)
+  @ValidateNested({ each: true })
+  @Type(() => SizePriceDto)
+  sizePrices: SizePriceDto[];
 
   @ApiPropertyOptional({ example: 'Rich moisturizing lotion' })
   @IsOptional()
   @IsString()
   description?: string;
-
-  @ApiProperty({
-    example: ['100 ml', '200 ml'],
-    type: [String],
-    required: false,
-  })
-  @IsOptional()
-  @IsArray()
-  @IsString({ each: true })
-  @Transform(({ value }) => {
-    if (typeof value === 'string') return value.split(',').map((v) => v.trim());
-    return Array.isArray(value) ? value : [];
-  })
-  size?: string[];
 
   // ✅ Use the new enum
   @ApiProperty({ example: 'unisex', enum: ProductSex })

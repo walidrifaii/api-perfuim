@@ -18,6 +18,7 @@ const typeorm_1 = require("@nestjs/typeorm");
 const typeorm_2 = require("typeorm");
 const order_schema_1 = require("./schemas/order.schema");
 const product_schema_1 = require("../product/schemas/product.schema");
+const size_prices_util_1 = require("../product/size-prices.util");
 const mailer_service_1 = require("./mailer.service");
 let OrderService = class OrderService {
     constructor(orderRepository, productRepository, dataSource, mailer) {
@@ -45,12 +46,7 @@ let OrderService = class OrderService {
             if (((_a = p.quantity) !== null && _a !== void 0 ? _a : 0) < it.quantity) {
                 throw new common_1.BadRequestException(`Insufficient stock for ${p.name}`);
             }
-            if (Array.isArray(p.size) && p.size.length > 0) {
-                if (it.size && !p.size.includes(it.size)) {
-                    throw new common_1.BadRequestException(`Invalid size "${it.size}" for product ${p.name}`);
-                }
-            }
-            const unitPrice = p.price;
+            const { unitPrice, sizeLabel } = (0, size_prices_util_1.resolveVariantForOrder)(p, it.size);
             const lineTotal = unitPrice * it.quantity;
             subtotal += lineTotal;
             return {
@@ -60,7 +56,7 @@ let OrderService = class OrderService {
                 lineTotal,
                 name: p.name,
                 brand: p.brand,
-                size: it.size || '',
+                size: sizeLabel,
             };
         });
         const total = subtotal;

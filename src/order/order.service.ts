@@ -5,6 +5,7 @@ import { DataSource, In, Repository } from 'typeorm';
 import { Order } from './schemas/order.schema';
 import { CreateOrderDto } from './dto/create-order.dto';
 import { Product } from '../product/schemas/product.schema';
+import { resolveVariantForOrder } from '../product/size-prices.util';
 import { MailerService } from './mailer.service';
 
 @Injectable()
@@ -47,15 +48,8 @@ export class OrderService {
         throw new BadRequestException(`Insufficient stock for ${p.name}`);
       }
 
-      if (Array.isArray(p.size) && p.size.length > 0) {
-        if (it.size && !p.size.includes(it.size)) {
-          throw new BadRequestException(
-            `Invalid size "${it.size}" for product ${p.name}`,
-          );
-        }
-      }
+      const { unitPrice, sizeLabel } = resolveVariantForOrder(p, it.size);
 
-      const unitPrice = p.price;
       const lineTotal = unitPrice * it.quantity;
       subtotal += lineTotal;
 
@@ -66,7 +60,7 @@ export class OrderService {
         lineTotal,
         name: p.name,
         brand: p.brand,
-        size: it.size || '',
+        size: sizeLabel,
       };
     });
 

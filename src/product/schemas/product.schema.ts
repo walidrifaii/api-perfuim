@@ -7,6 +7,11 @@ import {
 } from 'typeorm';
 import { ProductSex } from '../dto/create-product.dto'; // ✅ reuse the same enum
 
+export interface ProductSizePrice {
+  size: string;
+  price: number;
+}
+
 @Entity({ name: 'products' })
 export class Product {
   @PrimaryGeneratedColumn('uuid')
@@ -18,14 +23,11 @@ export class Product {
   @Column()
   brand: string;
 
-  @Column('float')
-  price: number;
+  @Column({ type: 'jsonb', default: () => "'[]'::jsonb" })
+  sizePrices: ProductSizePrice[];
 
   @Column({ default: '' })
   description: string;
-
-  @Column('simple-array', { default: '' })
-  size: string[];
 
   @Column({
     type: 'enum',

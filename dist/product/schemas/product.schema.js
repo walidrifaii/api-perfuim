@@ -27,17 +27,13 @@ __decorate([
     __metadata("design:type", String)
 ], Product.prototype, "brand", void 0);
 __decorate([
-    (0, typeorm_1.Column)('float'),
-    __metadata("design:type", Number)
-], Product.prototype, "price", void 0);
+    (0, typeorm_1.Column)({ type: 'jsonb', default: () => "'[]'::jsonb" }),
+    __metadata("design:type", Array)
+], Product.prototype, "sizePrices", void 0);
 __decorate([
     (0, typeorm_1.Column)({ default: '' }),
     __metadata("design:type", String)
 ], Product.prototype, "description", void 0);
-__decorate([
-    (0, typeorm_1.Column)('simple-array', { default: '' }),
-    __metadata("design:type", Array)
-], Product.prototype, "size", void 0);
 __decorate([
     (0, typeorm_1.Column)({
         type: 'enum',

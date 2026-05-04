@@ -5,6 +5,22 @@ import { AppModule } from './app.module';
 import { ExpressAdapter } from '@nestjs/platform-express';
 import express from 'express';
 
+function buildAllowedOrigins(): string[] {
+  const fromEnv =
+    process.env.CORS_ORIGINS?.split(',')
+      .map((s) => s.trim())
+      .filter(Boolean) ?? [];
+  const frontend = process.env.FRONTEND_URL?.trim();
+  const defaults = [
+    'https://a-h-tau.vercel.app',
+    'http://localhost:3000',
+    'http://localhost:5173',
+    'http://127.0.0.1:5173',
+    ...(frontend ? [frontend] : []),
+  ];
+  return [...new Set([...defaults, ...fromEnv])];
+}
+
 export async function createNestApp(
   adapter?: ExpressAdapter,
 ): Promise<INestApplication> {
@@ -12,9 +28,29 @@ export async function createNestApp(
     ? await NestFactory.create(AppModule, adapter)
     : await NestFactory.create(AppModule);
 
+  const allowedOrigins = buildAllowedOrigins();
+
   app.enableCors({
-    origin: true,
-    methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
+    origin: (origin, callback) => {
+      // Same-origin, curl, Postman, mobile — no Origin header
+      if (!origin) {
+        callback(null, true);
+        return;
+      }
+      if (allowedOrigins.includes(origin)) {
+        callback(null, true);
+        return;
+      }
+      callback(null, false);
+    },
+    methods: ['GET', 'HEAD', 'PUT', 'PATCH', 'POST', 'DELETE', 'OPTIONS'],
+    allowedHeaders: [
+      'Content-Type',
+      'Authorization',
+      'Accept',
+      'Origin',
+      'X-Requested-With',
+    ],
     credentials: true,
   });
 

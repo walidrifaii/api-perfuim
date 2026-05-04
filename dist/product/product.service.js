@@ -17,6 +17,7 @@ const common_1 = require("@nestjs/common");
 const typeorm_1 = require("@nestjs/typeorm");
 const typeorm_2 = require("typeorm");
 const product_schema_1 = require("./schemas/product.schema");
+const size_prices_util_1 = require("./size-prices.util");
 let ProductService = class ProductService {
     constructor(productRepository) {
         this.productRepository = productRepository;
@@ -30,18 +31,30 @@ let ProductService = class ProductService {
             where.sex = filters.sex;
         if (filters.brand)
             where.brand = filters.brand;
-        if (filters.minPrice !== undefined)
-            where.price = (0, typeorm_2.MoreThanOrEqual)(filters.minPrice);
-        if (filters.maxPrice !== undefined)
-            where.price =
-                filters.minPrice !== undefined
-                    ? (0, typeorm_2.Between)(filters.minPrice, filters.maxPrice)
-                    : (0, typeorm_2.LessThanOrEqual)(filters.maxPrice);
         const products = await this.productRepository.find({ where });
-        if (filters.size) {
-            return products.filter((p) => { var _a; return (_a = p.size) === null || _a === void 0 ? void 0 : _a.includes(filters.size); });
-        }
-        return products;
+        return products.filter((p) => {
+            var _a;
+            const variants = (_a = p.sizePrices) !== null && _a !== void 0 ? _a : [];
+            if (filters.size) {
+                const want = String(filters.size).trim();
+                if (!variants.some((v) => v.size.trim() === want))
+                    return false;
+            }
+            if (filters.minPrice !== undefined || filters.maxPrice !== undefined) {
+                if (variants.length === 0)
+                    return false;
+                const minF = filters.minPrice;
+                const maxF = filters.maxPrice;
+                return variants.some((v) => {
+                    if (minF !== undefined && v.price < minF)
+                        return false;
+                    if (maxF !== undefined && v.price > maxF)
+                        return false;
+                    return true;
+                });
+            }
+            return true;
+        });
     }
     async findById(id) {
         const product = await this.productRepository.findOne({ where: { id } });
@@ -50,6 +63,7 @@ let ProductService = class ProductService {
         return product;
     }
     async create(dto) {
+        (0, size_prices_util_1.assertDistinctSizes)(dto.sizePrices);
         const created = this.productRepository.create(dto);
         return this.productRepository.save(created);
     }
@@ -57,6 +71,12 @@ let ProductService = class ProductService {
         const product = await this.productRepository.findOne({ where: { id } });
         if (!product) {
             throw new common_1.NotFoundException('Product not found.');
+        }
+        if (dto.sizePrices !== undefined) {
+            if (!dto.sizePrices.length) {
+                throw new common_1.BadRequestException('sizePrices cannot be empty');
+            }
+            (0, size_prices_util_1.assertDistinctSizes)(dto.sizePrices);
         }
         const merged = this.productRepository.merge(product, dto);
         return this.productRepository.save(merged);

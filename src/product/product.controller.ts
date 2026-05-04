@@ -4,6 +4,7 @@ import {
   Param,
   Post,
   Put,
+  Patch,
   UploadedFile,
   UseInterceptors,
   UseGuards,
@@ -48,17 +49,27 @@ export class ProductController {
   @ApiBody({
     schema: {
       type: 'object',
-      required: ['name', 'brand', 'price', 'sex'],
+      required: ['name', 'brand', 'sizePrices', 'sex', 'quantity'],
       properties: {
         name: { type: 'string', example: 'Body Lotion' },
         brand: { type: 'string', example: 'Nivea' },
-        price: { type: 'number', example: 29.99 },
         quantity: { type: 'number', example: 500 },
         description: { type: 'string', example: 'Rich moisturizing lotion' },
-        size: {
+        sizePrices: {
+          description:
+            'JSON array of { size, price } — as JSON string in multipart or array in JSON body',
           type: 'array',
-          items: { type: 'string' },
-          example: ['100 ml', '200 ml'],
+          items: {
+            type: 'object',
+            properties: {
+              size: { type: 'string', example: '100 ml' },
+              price: { type: 'number', example: 19.99 },
+            },
+          },
+          example: [
+            { size: '100 ml', price: 19.99 },
+            { size: '200 ml', price: 34.99 },
+          ],
         },
         sex: {
           type: 'string',
@@ -100,12 +111,16 @@ export class ProductController {
       properties: {
         name: { type: 'string' },
         brand: { type: 'string' },
-        price: { type: 'number' },
         description: { type: 'string' },
-        size: {
+        sizePrices: {
           type: 'array',
-          items: { type: 'string' },
-          example: ['250 ml', '500 ml'],
+          items: {
+            type: 'object',
+            properties: {
+              size: { type: 'string' },
+              price: { type: 'number' },
+            },
+          },
         },
         sex: { type: 'string', enum: ['men', 'women', 'unisex'] },
         isActive: { type: 'boolean' },
@@ -116,6 +131,7 @@ export class ProductController {
   @UseGuards(JwtAuthGuard, AdminGuard)
   @UseInterceptors(FileInterceptor('image', { storage: memoryStorage() }))
   @Put(':id')
+  @Patch(':id')
   async update(
     @Param('id') id: string,
     @Body() body: UpdateProductDto,

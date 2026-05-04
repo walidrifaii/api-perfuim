@@ -56,17 +56,26 @@ __decorate([
     (0, swagger_1.ApiBody)({
         schema: {
             type: 'object',
-            required: ['name', 'brand', 'price', 'sex'],
+            required: ['name', 'brand', 'sizePrices', 'sex', 'quantity'],
             properties: {
                 name: { type: 'string', example: 'Body Lotion' },
                 brand: { type: 'string', example: 'Nivea' },
-                price: { type: 'number', example: 29.99 },
                 quantity: { type: 'number', example: 500 },
                 description: { type: 'string', example: 'Rich moisturizing lotion' },
-                size: {
+                sizePrices: {
+                    description: 'JSON array of { size, price } — as JSON string in multipart or array in JSON body',
                     type: 'array',
-                    items: { type: 'string' },
-                    example: ['100 ml', '200 ml'],
+                    items: {
+                        type: 'object',
+                        properties: {
+                            size: { type: 'string', example: '100 ml' },
+                            price: { type: 'number', example: 19.99 },
+                        },
+                    },
+                    example: [
+                        { size: '100 ml', price: 19.99 },
+                        { size: '200 ml', price: 34.99 },
+                    ],
                 },
                 sex: {
                     type: 'string',
@@ -100,12 +109,16 @@ __decorate([
             properties: {
                 name: { type: 'string' },
                 brand: { type: 'string' },
-                price: { type: 'number' },
                 description: { type: 'string' },
-                size: {
+                sizePrices: {
                     type: 'array',
-                    items: { type: 'string' },
-                    example: ['250 ml', '500 ml'],
+                    items: {
+                        type: 'object',
+                        properties: {
+                            size: { type: 'string' },
+                            price: { type: 'number' },
+                        },
+                    },
                 },
                 sex: { type: 'string', enum: ['men', 'women', 'unisex'] },
                 isActive: { type: 'boolean' },
@@ -116,6 +129,7 @@ __decorate([
     (0, common_1.UseGuards)(jwt_auth_guard_1.JwtAuthGuard, admin_guard_1.AdminGuard),
     (0, common_1.UseInterceptors)((0, platform_express_1.FileInterceptor)('image', { storage: (0, multer_1.memoryStorage)() })),
     (0, common_1.Put)(':id'),
+    (0, common_1.Patch)(':id'),
     __param(0, (0, common_1.Param)('id')),
     __param(1, (0, common_1.Body)()),
     __param(2, (0, common_1.UploadedFile)()),

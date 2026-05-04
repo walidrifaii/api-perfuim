@@ -1,9 +1,10 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Between, FindOptionsWhere, LessThanOrEqual, MoreThanOrEqual, Repository } from 'typeorm';
+import { FindOptionsWhere, Repository } from 'typeorm';
 import { Product } from './schemas/product.schema';
 import { CreateProductDto } from './dto/create-product.dto';
 import { UpdateProductDto } from './dto/update-product.dto';
+import { assertDistinctSizes } from './size-prices.util';
 
 interface ProductFilters {
   sex?: string;
@@ -30,19 +31,26 @@ export class ProductService {
 
     if (filters.sex) where.sex = filters.sex as any;
     if (filters.brand) where.brand = filters.brand;
-    if (filters.minPrice !== undefined)
-      where.price = MoreThanOrEqual(filters.minPrice);
-    if (filters.maxPrice !== undefined)
-      where.price =
-        filters.minPrice !== undefined
-          ? Between(filters.minPrice, filters.maxPrice)
-          : LessThanOrEqual(filters.maxPrice);
 
     const products = await this.productRepository.find({ where });
-    if (filters.size) {
-      return products.filter((p) => p.size?.includes(filters.size as string));
-    }
-    return products;
+    return products.filter((p) => {
+      const variants = p.sizePrices ?? [];
+      if (filters.size) {
+        const want = String(filters.size).trim();
+        if (!variants.some((v) => v.size.trim() === want)) return false;
+      }
+      if (filters.minPrice !== undefined || filters.maxPrice !== undefined) {
+        if (variants.length === 0) return false;
+        const minF = filters.minPrice;
+        const maxF = filters.maxPrice;
+        return variants.some((v) => {
+          if (minF !== undefined && v.price < minF) return false;
+          if (maxF !== undefined && v.price > maxF) return false;
+          return true;
+        });
+      }
+      return true;
+    });
   }
 
   // ✅ Public single product
@@ -54,6 +62,7 @@ export class ProductService {
 
   // ✅ Create product
   async create(dto: CreateProductDto): Promise<Product> {
+    assertDistinctSizes(dto.sizePrices);
     const created = this.productRepository.create(dto);
     return this.productRepository.save(created);
   }
@@ -63,6 +72,12 @@ export class ProductService {
     const product = await this.productRepository.findOne({ where: { id } });
     if (!product) {
       throw new NotFoundException('Product not found.');
+    }
+    if (dto.sizePrices !== undefined) {
+      if (!dto.sizePrices.length) {
+        throw new BadRequestException('sizePrices cannot be empty');
+      }
+      assertDistinctSizes(dto.sizePrices);
     }
     const merged = this.productRepository.merge(product, dto);
     return this.productRepository.save(merged);

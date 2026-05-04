@@ -13,6 +13,7 @@ exports.CreateProductDto = exports.ProductSex = void 0;
 const swagger_1 = require("@nestjs/swagger");
 const class_validator_1 = require("class-validator");
 const class_transformer_1 = require("class-transformer");
+const size_price_dto_1 = require("./size-price.dto");
 var ProductSex;
 (function (ProductSex) {
     ProductSex["MEN"] = "men";
@@ -32,34 +33,43 @@ __decorate([
     __metadata("design:type", String)
 ], CreateProductDto.prototype, "brand", void 0);
 __decorate([
-    (0, swagger_1.ApiProperty)({ example: 29.99, minimum: 0 }),
-    (0, class_transformer_1.Type)(() => Number),
-    (0, class_validator_1.IsNumber)(),
-    (0, class_validator_1.Min)(0),
-    __metadata("design:type", Number)
-], CreateProductDto.prototype, "price", void 0);
+    (0, swagger_1.ApiProperty)({
+        description: 'Each variant: size label and its price (JSON array or multipart string)',
+        type: [size_price_dto_1.SizePriceDto],
+        example: [
+            { size: '100 ml', price: 19.99 },
+            { size: '200 ml', price: 34.99 },
+        ],
+    }),
+    (0, class_transformer_1.Transform)(({ value }) => {
+        if (value == null || value === '')
+            return undefined;
+        let raw = value;
+        if (typeof value === 'string') {
+            try {
+                const parsed = JSON.parse(value);
+                raw = Array.isArray(parsed) ? parsed : [parsed];
+            }
+            catch (_a) {
+                return value;
+            }
+        }
+        if (!Array.isArray(raw))
+            return raw;
+        return raw.map((item) => (0, class_transformer_1.plainToInstance)(size_price_dto_1.SizePriceDto, item, { enableImplicitConversion: true }));
+    }),
+    (0, class_validator_1.IsArray)(),
+    (0, class_validator_1.ArrayMinSize)(1),
+    (0, class_validator_1.ValidateNested)({ each: true }),
+    (0, class_transformer_1.Type)(() => size_price_dto_1.SizePriceDto),
+    __metadata("design:type", Array)
+], CreateProductDto.prototype, "sizePrices", void 0);
 __decorate([
     (0, swagger_1.ApiPropertyOptional)({ example: 'Rich moisturizing lotion' }),
     (0, class_validator_1.IsOptional)(),
     (0, class_validator_1.IsString)(),
     __metadata("design:type", String)
 ], CreateProductDto.prototype, "description", void 0);
-__decorate([
-    (0, swagger_1.ApiProperty)({
-        example: ['100 ml', '200 ml'],
-        type: [String],
-        required: false,
-    }),
-    (0, class_validator_1.IsOptional)(),
-    (0, class_validator_1.IsArray)(),
-    (0, class_validator_1.IsString)({ each: true }),
-    (0, class_transformer_1.Transform)(({ value }) => {
-        if (typeof value === 'string')
-            return value.split(',').map((v) => v.trim());
-        return Array.isArray(value) ? value : [];
-    }),
-    __metadata("design:type", Array)
-], CreateProductDto.prototype, "size", void 0);
 __decorate([
     (0, swagger_1.ApiProperty)({ example: 'unisex', enum: ProductSex }),
     (0, class_validator_1.IsEnum)(ProductSex),

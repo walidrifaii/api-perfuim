@@ -1,3 +1,4 @@
+import { SizePriceDto } from './size-price.dto';
 export declare enum ProductSex {
     MEN = "men",
     WOMEN = "women",
@@ -6,9 +7,8 @@ export declare enum ProductSex {
 export declare class CreateProductDto {
     name: string;
     brand: string;
-    price: number;
+    sizePrices: SizePriceDto[];
     description?: string;
-    size?: string[];
     sex: ProductSex;
     isActive?: boolean;
     image?: string;
