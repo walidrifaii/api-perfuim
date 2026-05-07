@@ -1,7 +1,9 @@
 import {
   Body,
   Controller,
+  Delete,
   Param,
+  ParseUUIDPipe,
   Post,
   Put,
   Patch,
@@ -160,5 +162,16 @@ export class ProductController {
   @Get('women')
   async getWomenProducts(): Promise<Product[]> {
     return this.productService.findBySex('women');
+  }
+
+  // --------- DELETE (admin only) ----------
+  @ApiOperation({ summary: 'Delete a product by id (admin only)' })
+  @ApiOkResponse({ description: 'Product deleted successfully' })
+  @ApiParam({ name: 'id', description: 'Product UUID' })
+  @UseGuards(JwtAuthGuard, AdminGuard)
+  @Delete(':id')
+  async delete(@Param('id', new ParseUUIDPipe()) id: string) {
+    await this.productService.deleteById(id);
+    return { message: 'Product deleted successfully' };
   }
 }

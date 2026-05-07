@@ -1,5 +1,9 @@
 // src/order/order.service.ts
-import { BadRequestException, Injectable } from '@nestjs/common';
+import {
+  BadRequestException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { DataSource, In, Repository } from 'typeorm';
 import { Order } from './schemas/order.schema';
@@ -109,6 +113,63 @@ export class OrderService {
       .catch((error) => console.error('Failed to send order email:', error));
 
     return order;
+  }
+
+  async getUserCheckouts(customerEmail?: string, customerPhone?: string) {
+    const where = this.buildUserWhere(customerEmail, customerPhone);
+    return this.orderRepository.find({
+      where,
+      order: { createdAt: 'DESC' },
+    });
+  }
+
+  async getCheckoutDetails(
+    id: string,
+    customerEmail?: string,
+    customerPhone?: string,
+  ): Promise<Order> {
+    const where = this.buildUserWhere(customerEmail, customerPhone);
+    const order = await this.orderRepository.findOne({
+      where: { id, ...where },
+    });
+
+    if (!order) {
+      throw new NotFoundException('Checkout not found for this user');
+    }
+
+    return order;
+  }
+
+  async getAllCheckoutsForAdmin(): Promise<Order[]> {
+    return this.orderRepository.find({
+      order: { createdAt: 'DESC' },
+    });
+  }
+
+  async getCheckoutDetailsForAdmin(id: string): Promise<Order> {
+    const order = await this.orderRepository.findOne({ where: { id } });
+    if (!order) {
+      throw new NotFoundException('Checkout not found');
+    }
+    return order;
+  }
+
+  private buildUserWhere(customerEmail?: string, customerPhone?: string) {
+    if (!customerEmail && !customerPhone) {
+      throw new BadRequestException(
+        'Provide customerEmail or customerPhone to fetch user checkouts',
+      );
+    }
+
+    if (customerEmail && customerPhone) {
+      return { customerEmail, customerPhone };
+    }
+
+    if (customerEmail) {
+      return { customerEmail };
+    }
+
+    return { customerPhone: customerPhone as string };
   }
 
   private renderEmail(order: Order): string {

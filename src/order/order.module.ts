@@ -5,10 +5,11 @@ import { OrderController } from './order.controller';
 import { OrderService } from './order.service';
 import { Product } from '../product/schemas/product.schema';
 import { MailerService } from './mailer.service';
+import { AdminCheckoutController } from './admin-checkout.controller';
 
 @Module({
   imports: [TypeOrmModule.forFeature([Order, Product])],
-  controllers: [OrderController],
+  controllers: [OrderController, AdminCheckoutController],
   providers: [OrderService, MailerService],
 })
 export class OrderModule {}

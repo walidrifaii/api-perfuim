@@ -1,4 +1,8 @@
-import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
+import {
+  BadRequestException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { FindOptionsWhere, Repository } from 'typeorm';
 import { Product } from './schemas/product.schema';
@@ -87,5 +91,12 @@ export class ProductService {
     return this.productRepository.find({
       where: { sex: sex as any, isActive: true },
     });
+  }
+
+  async deleteById(id: string): Promise<void> {
+    const result = await this.productRepository.delete({ id });
+    if (!result.affected) {
+      throw new NotFoundException('Product not found.');
+    }
   }
 }

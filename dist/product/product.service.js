@@ -86,6 +86,12 @@ let ProductService = class ProductService {
             where: { sex: sex, isActive: true },
         });
     }
+    async deleteById(id) {
+        const result = await this.productRepository.delete({ id });
+        if (!result.affected) {
+            throw new common_1.NotFoundException('Product not found.');
+        }
+    }
 };
 ProductService = __decorate([
     (0, common_1.Injectable)(),

@@ -12,4 +12,7 @@ export declare class ProductController {
     update(id: string, body: UpdateProductDto, file?: Express.Multer.File): Promise<Product>;
     getMenProducts(): Promise<Product[]>;
     getWomenProducts(): Promise<Product[]>;
+    delete(id: string): Promise<{
+        message: string;
+    }>;
 }

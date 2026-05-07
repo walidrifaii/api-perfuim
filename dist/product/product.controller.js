@@ -48,6 +48,10 @@ let ProductController = class ProductController {
     async getWomenProducts() {
         return this.productService.findBySex('women');
     }
+    async delete(id) {
+        await this.productService.deleteById(id);
+        return { message: 'Product deleted successfully' };
+    }
 };
 __decorate([
     (0, swagger_1.ApiOperation)({ summary: 'Create a product (image upload to Cloudinary)' }),
@@ -153,6 +157,17 @@ __decorate([
     __metadata("design:paramtypes", []),
     __metadata("design:returntype", Promise)
 ], ProductController.prototype, "getWomenProducts", null);
+__decorate([
+    (0, swagger_1.ApiOperation)({ summary: 'Delete a product by id (admin only)' }),
+    (0, swagger_1.ApiOkResponse)({ description: 'Product deleted successfully' }),
+    (0, swagger_1.ApiParam)({ name: 'id', description: 'Product UUID' }),
+    (0, common_1.UseGuards)(jwt_auth_guard_1.JwtAuthGuard, admin_guard_1.AdminGuard),
+    (0, common_1.Delete)(':id'),
+    __param(0, (0, common_1.Param)('id', new common_1.ParseUUIDPipe())),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [String]),
+    __metadata("design:returntype", Promise)
+], ProductController.prototype, "delete", null);
 ProductController = __decorate([
     (0, swagger_1.ApiTags)('Admin Products'),
     (0, swagger_1.ApiBearerAuth)('bearer'),

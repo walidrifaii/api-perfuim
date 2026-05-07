@@ -18,5 +18,6 @@ export declare class ProductService {
     create(dto: CreateProductDto): Promise<Product>;
     updateById(id: string, dto: UpdateProductDto): Promise<Product>;
     findBySex(sex: string): Promise<Product[]>;
+    deleteById(id: string): Promise<void>;
 }
 export {};

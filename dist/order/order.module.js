@@ -14,12 +14,13 @@ const order_controller_1 = require("./order.controller");
 const order_service_1 = require("./order.service");
 const product_schema_1 = require("../product/schemas/product.schema");
 const mailer_service_1 = require("./mailer.service");
+const admin_checkout_controller_1 = require("./admin-checkout.controller");
 let OrderModule = class OrderModule {
 };
 OrderModule = __decorate([
     (0, common_1.Module)({
         imports: [typeorm_1.TypeOrmModule.forFeature([order_schema_1.Order, product_schema_1.Product])],
-        controllers: [order_controller_1.OrderController],
+        controllers: [order_controller_1.OrderController, admin_checkout_controller_1.AdminCheckoutController],
         providers: [order_service_1.OrderService, mailer_service_1.MailerService],
     })
 ], OrderModule);

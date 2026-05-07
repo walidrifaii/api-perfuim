@@ -10,5 +10,10 @@ export declare class OrderService {
     private readonly mailer;
     constructor(orderRepository: Repository<Order>, productRepository: Repository<Product>, dataSource: DataSource, mailer: MailerService);
     checkout(dto: CreateOrderDto): Promise<Order>;
+    getUserCheckouts(customerEmail?: string, customerPhone?: string): Promise<Order[]>;
+    getCheckoutDetails(id: string, customerEmail?: string, customerPhone?: string): Promise<Order>;
+    getAllCheckoutsForAdmin(): Promise<Order[]>;
+    getCheckoutDetailsForAdmin(id: string): Promise<Order>;
+    private buildUserWhere;
     private renderEmail;
 }
